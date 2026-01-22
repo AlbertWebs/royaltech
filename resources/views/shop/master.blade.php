@@ -167,14 +167,110 @@
         }
     });
     
-    // Special case for home page
-    if (currentPath === '/' || currentPath === '') {
-        var homeItem = document.querySelector('.mobile-bottom-nav .nav-item[data-page="home"]');
-        if (homeItem) {
-            homeItem.classList.add('active');
+        // Special case for home page
+        if (currentPath === '/' || currentPath === '') {
+            var homeItem = document.querySelector('.mobile-bottom-nav .nav-item[data-page="home"]');
+            if (homeItem) {
+                homeItem.classList.add('active');
+            }
         }
-    }
-})();
+    })();
+    
+    // Enhanced Mobile Menu Functionality
+    (function() {
+        // Handle menu toggle buttons
+        var showVerticalMenu = document.getElementById('show-verticalmenu');
+        var showMegaMenu = document.getElementById('show-megamenu');
+        var verticalWrapper = document.querySelector('.vertical-wrapper');
+        var megaMenuWrapper = document.querySelector('.megamenu-wrapper');
+        var removeVerticalMenu = document.getElementById('remove-verticalmenu');
+        var removeMegaMenu = document.getElementById('remove-megamenu');
+        var body = document.body;
+        
+        // Prevent body scroll when menu is open
+        function preventBodyScroll() {
+            body.style.overflow = 'hidden';
+        }
+        
+        function allowBodyScroll() {
+            body.style.overflow = '';
+        }
+        
+        // Show vertical menu (Categories)
+        if (showVerticalMenu) {
+            showVerticalMenu.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (verticalWrapper) {
+                    verticalWrapper.classList.add('active');
+                    preventBodyScroll();
+                }
+            });
+        }
+        
+        // Show mega menu (Navigation)
+        if (showMegaMenu) {
+            showMegaMenu.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (megaMenuWrapper) {
+                    megaMenuWrapper.classList.add('active');
+                    preventBodyScroll();
+                }
+            });
+        }
+        
+        // Close vertical menu
+        if (removeVerticalMenu) {
+            removeVerticalMenu.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (verticalWrapper) {
+                    verticalWrapper.classList.remove('active');
+                    allowBodyScroll();
+                }
+            });
+        }
+        
+        // Close mega menu
+        if (removeMegaMenu) {
+            removeMegaMenu.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (megaMenuWrapper) {
+                    megaMenuWrapper.classList.remove('active');
+                    allowBodyScroll();
+                }
+            });
+        }
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (verticalWrapper && verticalWrapper.classList.contains('active')) {
+                if (!verticalWrapper.contains(e.target) && !showVerticalMenu.contains(e.target)) {
+                    verticalWrapper.classList.remove('active');
+                    allowBodyScroll();
+                }
+            }
+            
+            if (megaMenuWrapper && megaMenuWrapper.classList.contains('active')) {
+                if (!megaMenuWrapper.contains(e.target) && !showMegaMenu.contains(e.target)) {
+                    megaMenuWrapper.classList.remove('active');
+                    allowBodyScroll();
+                }
+            }
+        });
+        
+        // Close menu on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (verticalWrapper && verticalWrapper.classList.contains('active')) {
+                    verticalWrapper.classList.remove('active');
+                    allowBodyScroll();
+                }
+                if (megaMenuWrapper && megaMenuWrapper.classList.contains('active')) {
+                    megaMenuWrapper.classList.remove('active');
+                    allowBodyScroll();
+                }
+            }
+        });
+    })();
 </script>
 
    </body>

@@ -11,12 +11,16 @@
 <link href="{{asset('corporate/css/bootstrap.css')}}" rel="stylesheet">
 <link href="{{asset('corporate/css/style.css')}}" rel="stylesheet">
 <link href="{{asset('corporate/css/responsive.css')}}" rel="stylesheet">
+<link href="{{asset('corporate/css/corporate-elegant.css')}}" rel="stylesheet">
 
 <link href="{{asset('fonts.googleapis.com/css26778.css?family=Montserrat:wght@300;400;500;600;700;800;900&amp;family=Nunito+Sans:wght@300;600;700;800;900&amp;display=swap')}}" rel="stylesheet">
 
 @include('favicon')
 @include('tawkto')
 @include('pixels')
+
+@include('whatsApp')
+
 <!-- Color Themes -->
 <link id="theme-color-file" href="{{asset('corporate/css/color-themes/default-theme.css')}}" rel="stylesheet">
 
@@ -76,7 +80,7 @@
             <div class="close-btn"><span class="icon flaticon-multiply"></span></div>
 
             <nav class="menu-box">
-                <div class="nav-logo"><a href="{{url('/')}}"><img src="#" alt="" title=""></a></div>
+                <div class="nav-logo"><a href="{{url('/')}}"><img src="{{url('/')}}/uploads/Royaltech-Original-1.png" alt="Royal Tech Computers Limited" title=""></a></div>
                 <div class="menu-outer"><!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header--></div>
             </nav>
         </div><!-- End Mobile Menu -->
@@ -175,6 +179,75 @@
 <script src="{{asset('corporate/js/jquery-ui.js')}}"></script>
 <script src="{{asset('corporate/js/script.js')}}"></script>
 <script src="{{asset('corporate/js/color-settings.js')}}"></script>
+
+<!-- Mobile Bottom Navigation Menu -->
+<nav class="mobile-bottom-nav">
+    <a href="{{url('/')}}" class="nav-item" data-page="home">
+        <span class="nav-icon fa fa-home"></span>
+        <span class="nav-label">Home</span>
+    </a>
+    <a href="{{url('/')}}/laptops-for-hire" class="nav-item" data-page="hire">
+        <span class="nav-icon fa fa-laptop"></span>
+        <span class="nav-label">Hire</span>
+    </a>
+    <a href="{{url('/')}}/e-commerce" class="nav-item" data-page="shop">
+        <span class="nav-icon fa fa-shopping-cart"></span>
+        <span class="nav-label">Shop</span>
+    </a>
+    <a href="https://api.whatsapp.com/send?phone=254724404935&text=Hello there, i am texing from Royal Tech Website" class="nav-item" data-page="contact" target="_blank">
+        <span class="nav-icon fa fa-whatsapp"></span>
+        <span class="nav-label">Contact</span>
+    </a>
+    <a href="{{url('/')}}/the-company" class="nav-item" data-page="about">
+        <span class="nav-icon fa fa-info"></span>
+        <span class="nav-label">About</span>
+    </a>
+</nav>
+<!-- End Mobile Bottom Navigation Menu -->
+
+<script>
+// Set active state for mobile bottom nav based on current page
+(function() {
+    var currentPath = window.location.pathname;
+    var currentUrl = window.location.href;
+    var navItems = document.querySelectorAll('.mobile-bottom-nav .nav-item');
+    
+    navItems.forEach(function(item) {
+        var itemHref = item.getAttribute('href');
+        var itemPage = item.getAttribute('data-page');
+        
+        // Remove active class first
+        item.classList.remove('active');
+        
+        // Skip WhatsApp links (external links)
+        if (itemHref && itemHref.startsWith('http') && !itemHref.includes(window.location.hostname)) {
+            return;
+        }
+        
+        var itemPath = new URL(itemHref, window.location.origin).pathname;
+        
+        // Check if current path matches
+        if (currentPath === itemPath || currentPath === itemPath + '/') {
+            item.classList.add('active');
+        } else if (itemPath !== '/' && currentPath.startsWith(itemPath)) {
+            item.classList.add('active');
+        }
+        
+        // Special handling for contact page - mark WhatsApp button as active
+        if (itemPage === 'contact' && (currentPath.includes('/contact') || currentPath.includes('/contact-us'))) {
+            item.classList.add('active');
+        }
+    });
+    
+    // Special case for home page
+    if (currentPath === '/' || currentPath === '') {
+        var homeItem = document.querySelector('.mobile-bottom-nav .nav-item[data-page="home"]');
+        if (homeItem) {
+            homeItem.classList.add('active');
+        }
+    }
+})();
+</script>
 
 </body>
 

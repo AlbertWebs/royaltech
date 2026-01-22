@@ -45,6 +45,7 @@
 <meta name="twitter:site" content="@RoyaltechC">
 
 <!-- Schema Markup -->
+ @verbatim
 <script type='application/ld+json'>
 {
   "@context": "http://www.schema.org",
@@ -73,18 +74,25 @@
   "telephone": "+254724404935"
 }
 </script>
+@endverbatim
 <!-- Stylesheets -->
 <link href="{{asset('corporate/css/bootstrap.css')}}" rel="stylesheet">
 <link href="{{asset('corporate/css/style.css')}}" rel="stylesheet">
 <link href="{{asset('corporate/css/responsive.css')}}" rel="stylesheet">
-<link href="{{asset('fonts.googleapis.com/css26778.css?family=Montserrat:wght@300;400;500;600;700;800;900&amp;family=Nunito+Sans:wght@300;600;700;800;900&amp;display=swap')}}" rel="stylesheet">
+<link href="{{asset('corporate/css/corporate-elegant.css')}}" rel="stylesheet">
+<link href="{{asset('corporate/css/hire-form-elegant.css')}}" rel="stylesheet">
+<link href="{{asset('corporate/css/breadcrumb-elegant.css')}}" rel="stylesheet">
 
-<!-- Color Themes -->
-<link id="theme-color-file" href="{{asset('corporate/css/color-themes/default-theme.css')}}" rel="stylesheet">
+<link href="{{asset('fonts.googleapis.com/css26778.css?family=Montserrat:wght@300;400;500;600;700;800;900&amp;family=Nunito+Sans:wght@300;600;700;800;900&amp;display=swap')}}" rel="stylesheet">
 
 @include('favicon')
 @include('tawkto')
 @include('pixels')
+
+@include('whatsApp')
+
+<!-- Color Themes -->
+<link id="theme-color-file" href="{{asset('corporate/css/color-themes/default-theme.css')}}" rel="stylesheet">
 
 <!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script><![endif]-->
 <!--[if lt IE 9]><script src="{{asset('corporate/js/respond.js')}}"></script><![endif]-->
@@ -98,7 +106,7 @@
     <div class="preloader"></div>
 
  	<!-- Main Header-->
-    <header class="main-header header-style-one">
+    <header class="main-header header-style-two">
 
 		<!-- Header Top Two -->
         <div class="header-top-two">
@@ -109,7 +117,7 @@
 					<div class="top-left clearfix">
 						<!-- Info List -->
 						<ul class="info-list">
-							<li>We are creative, ambitious and ready for challenges!<strong><a href="#">Hire Us</a></strong></li>
+							<li>We are creative, ambitious and ready for challenges!</li>
 							<li><a href="https://g.page/royaltech-computers-ltd?share"><span class="icon fa fa-location-arrow"></span> Biashara Street, Revlon Profesional Plaza, 2nd Floor, Suite 1</a></li>
 						</ul>
 					</div>
@@ -138,8 +146,10 @@
         <div class="header-upper">
         	<div class="outer-container clearfix">
 
-				<div class="pull-left logo-box" style="margin:10px !important">
-					<div class="logo"><a href="{{url('/')}}"><img style="max-height:70px"  src="{{url('/')}}/uploads/Royaltech-Original-1.png" alt="" title=""></a></div>
+				<div class="pull-left logo-box">
+					<div class="logo">
+						<a href="{{url('/')}}"><img style="max-height:100px"  src="{{url('/')}}/uploads/Royaltech-Original-White-1.png" alt="Royal Tech Computers Limited" title=""></a> &nbsp; &nbsp;
+					</div>
 				</div>
 
 
@@ -167,15 +177,21 @@
 					<div class="outer-box clearfix">
 
 						<!-- Cart Box -->
-						@include('front.carts')
+						{{-- @include('front.carts') --}}
 
 						<!-- Nav Btn -->
 						<div class="nav-btn navSidebar-button"><span class="icon flaticon-menu-2"></span></div>
 
+                        @if(Auth::User())
+                        <div class="btn-box">
+							<a href="{{url('/')}}/dashboard" class="theme-btn btn-style-one"><span class="txt"><span class="fa fa-user"></span> &nbsp; {{Auth::User()->name}}</span></a>
+						</div>
+                        @else
 						<!-- Quote Btn -->
 						<div class="btn-box">
-							<a href="{{url('/')}}/contact-us" class="theme-btn btn-style-one"><span class="txt">Free Consulting</span></a>
+							<a href="{{url('/')}}/contact-us" class="theme-btn btn-style-one"><span class="txt"><span class="fa fa-phone"></span> &nbsp; Contact us</span></a>
 						</div>
+                        @endif
 
 					</div>
 				</div>
@@ -202,7 +218,7 @@
 					<div class="outer-box clearfix">
 
 						<!-- Cart Box -->
-						@include('front.carts')
+						{{-- @include('front.carts') --}}
 
 						<!-- Search Btn -->
 						<div class="search-box-btn search-box-outer"><span class="icon fa fa-search"></span></div>
@@ -222,7 +238,7 @@
             <div class="close-btn"><span class="icon flaticon-multiply"></span></div>
 
             <nav class="menu-box">
-                <div class="nav-logo"><a href="{{url('/')}}"><img src="{{url('/')}}/uploads/Royaltech-Original-1.png" alt="" title=""></a></div>
+                <div class="nav-logo"><a href="{{url('/')}}"><img src="{{url('/')}}/uploads/Royaltech-Original-1.png" alt="Royal Tech Computers Limited" title=""></a></div>
                 <div class="menu-outer"><!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header--></div>
             </nav>
         </div><!-- End Mobile Menu -->
@@ -329,7 +345,79 @@
 <script src="{{asset('corporate/js/script.js')}}"></script>
 <script src="{{asset('corporate/js/color-settings.js')}}"></script>
 
+<!-- Mobile Bottom Navigation Menu -->
+<nav class="mobile-bottom-nav">
+    <a href="{{url('/')}}" class="nav-item" data-page="home">
+        <span class="nav-icon fa fa-home"></span>
+        <span class="nav-label">Home</span>
+    </a>
+    <a href="{{url('/')}}/laptops-for-hire" class="nav-item" data-page="hire">
+        <span class="nav-icon fa fa-laptop"></span>
+        <span class="nav-label">Hire</span>
+    </a>
+    <a href="{{url('/')}}/e-commerce" class="nav-item" data-page="shop">
+        <span class="nav-icon fa fa-shopping-cart"></span>
+        <span class="nav-label">Shop</span>
+    </a>
+    <a href="https://api.whatsapp.com/send?phone=254724404935&text=Hello there, i am texing from Royal Tech Website" class="nav-item" data-page="contact" target="_blank">
+        <span class="nav-icon fa fa-whatsapp"></span>
+        <span class="nav-label">Contact</span>
+    </a>
+    <a href="{{url('/')}}/the-company" class="nav-item" data-page="about">
+        <span class="nav-icon fa fa-info"></span>
+        <span class="nav-label">About</span>
+    </a>
+</nav>
+<!-- End Mobile Bottom Navigation Menu -->
 
+<script>
+// Set active state for mobile bottom nav based on current page
+(function() {
+    var currentPath = window.location.pathname;
+    var currentUrl = window.location.href;
+    var navItems = document.querySelectorAll('.mobile-bottom-nav .nav-item');
+    
+    navItems.forEach(function(item) {
+        var itemHref = item.getAttribute('href');
+        var itemPage = item.getAttribute('data-page');
+        
+        // Remove active class first
+        item.classList.remove('active');
+        
+        // Skip WhatsApp links (external links)
+        if (itemHref && itemHref.startsWith('http') && !itemHref.includes(window.location.hostname)) {
+            return;
+        }
+        
+        var itemPath = new URL(itemHref, window.location.origin).pathname;
+        
+        // Check if current path matches
+        if (currentPath === itemPath || currentPath === itemPath + '/') {
+            item.classList.add('active');
+        } else if (itemPath !== '/' && currentPath.startsWith(itemPath)) {
+            item.classList.add('active');
+        }
+        
+        // Special handling for projectors-for-hire pages - mark hire button as active
+        if (itemPage === 'hire' && currentPath.includes('/projectors-for-hire')) {
+            item.classList.add('active');
+        }
+        
+        // Special handling for contact page - mark WhatsApp button as active
+        if (itemPage === 'contact' && (currentPath.includes('/contact') || currentPath.includes('/contact-us'))) {
+            item.classList.add('active');
+        }
+    });
+    
+    // Special case for home page
+    if (currentPath === '/' || currentPath === '') {
+        var homeItem = document.querySelector('.mobile-bottom-nav .nav-item[data-page="home"]');
+        if (homeItem) {
+            homeItem.classList.add('active');
+        }
+    }
+})();
+</script>
 
 </body>
 

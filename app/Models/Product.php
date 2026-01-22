@@ -4,10 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use BinaryCats\Sku\HasSku;
 
 class Product extends Model
 {
     use HasFactory;
-    use HasSku;
+    
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name',
+        'sku',
+        'price',
+        'price_raw',
+        'category',
+        'brand',
+        'pro_condition',
+        'slung',
+        'meta',
+        'image_one',
+        'image_two',
+        // Add other fillable fields as needed
+    ];
 }

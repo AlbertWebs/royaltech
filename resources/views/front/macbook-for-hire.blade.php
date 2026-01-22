@@ -4,10 +4,18 @@
     <section class="page-title">
         <div class="pattern-layer-one" style="background-image: url('{{asset('corporate/images/background/pattern-16.png')}}')"></div>
         <div class="auto-container">
-            <h2>Macbooks for Hire?</h2>
-            <ul class="page-breadcrumb">
-                <li><a href="{{url('/')}}">home</a></li>
-                <li>Macbooks for Hire</li>
+            <h2>MacBooks for Hire</h2>
+            <ul class="page-breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
+                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                    <a href="{{url('/')}}" itemprop="item">
+                        <span itemprop="name">Home</span>
+                    </a>
+                    <meta itemprop="position" content="1" />
+                </li>
+                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                    <span itemprop="name">MacBooks for Hire</span>
+                    <meta itemprop="position" content="2" />
+                </li>
             </ul>
         </div>
     </section>
@@ -475,86 +483,80 @@ breaking your savings account.
 <br>
     	<!-- Contact Map Section -->
 	<section class="contact-map-section">
-		<div class="auto-container" style="border:6px solid #1c2c52; border-radius:10px;">
+		<div class="auto-container">
 			<!-- Sec Title -->
 			<div class="sec-title">
-				<div class="clearfix">
-					<div class="pull-left">
-						<div class="title">&nbsp;</div>
-						<h2>Request a MacBook Here</h2>
-					</div>
-					<div class="pull-right">
-						<div class="text">Fill up this form with your required details <br> We will get back to you as soon as we can</div>
-					</div>
-				</div>
+				<h2>Request a MacBook Here</h2>
+				<div class="text">Fill up this form with your required details. We will get back to you as soon as we can.</div>
 			</div>
 
+			<!-- Form Message (Success/Error) -->
+			<div id="form-message" class="form-message" style="display: none;"></div>
 
 			<!-- Contact Form -->
 			<div class="contact-form">
-
-				<!-- Contact Form -->
-				<form method="post" action="{{url('/')}}/laptops-for-hire" id="laptop-for-hire" >
+				<form method="post" action="{{url('/')}}/laptops-for-hire" id="laptop-for-hire">
                     @csrf
 					<div class="row clearfix">
 
 						<div class="form-group col-lg-12 col-md-6 col-sm-12">
-							<label>Your name *</label>
-							<input type="text" name="name" placeholder="" required>
+							<label>Your Full Name</label>
+							<input type="text" name="name" placeholder="Enter your full name" required>
 						</div>
 
 						<div class="form-group col-lg-6 col-md-6 col-sm-12">
-							<label>Email address *</label>
-							<input type="email" name="email" placeholder="" required>
+							<label>Email Address</label>
+							<input type="email" name="email" placeholder="your.email@example.com" required>
 						</div>
 
 						<div class="form-group col-lg-6 col-md-6 col-sm-12">
-							<label>Phone number *</label>
-							<input type="text" name="phone" placeholder="" required>
+							<label>Phone Number</label>
+							<input type="tel" name="phone" placeholder="0724 404935" required>
 						</div>
 
 						<div class="form-group col-lg-6 col-md-6 col-sm-12">
 							<label>Pick-Up/Delivery Date</label>
-							<input type="date" name="date" placeholder="" required>
+							<input type="date" name="date" required>
 						</div>
 
                         <div class="form-group col-lg-6 col-md-6 col-sm-12">
-							<label>Number of Laptops *</label>
-							<input type="number" name="number" placeholder="" required>
+							<label>Number of MacBooks</label>
+							<input type="number" name="number" placeholder="e.g. 1, 2, 5" min="1" required>
 						</div>
 
 						<div class="form-group col-lg-12 col-md-12 col-sm-12">
-							<label>Desired Specs/Model *</label>
-							<textarea name="message" placeholder="MacBook Pro M2 8gb Ram" required></textarea>
+							<label>Desired Specs/Model</label>
+							<textarea name="message" placeholder="e.g. MacBook Pro M2, 8GB RAM, 256GB SSD" rows="5" required></textarea>
 						</div>
 
                         <?php
 						$ops = array('-', '+');
 						$answer = -1;
-
 						$num1 = rand(0, 50);
 						$num2 = rand(0, 15);
-
 						$answer = $num1 + $num2;
-
 						?>
                         <div class="form-group col-lg-12 col-md-12 col-sm-12">
                             <input type="hidden" name="correct_answer" id="correct_answer" value="{{$answer}}">
-                            <input required class="form-control" value="{{$answer}}" type="hidden" id="verify_contact" name="verify_contact">
+                            <input type="hidden" name="verify_contact" value="{{$answer}}">
+                            <label>Security Verification</label>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Are you human? {{$num1}} + {{$num2}} =</label>
-                                        <input required class="form-control" value="" type="text" id="verify_contact" name="verify_contact_input">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label style="text-transform: none; padding-left: 0; font-size: 16px;">Are you human? {{$num1}} + {{$num2}} = ?</label>
+                                        <input type="text" name="verify_contact_input" placeholder="Enter the answer" required style="font-size: 18px; font-weight: 700; text-align: center; letter-spacing: 2px;">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="clearfix"></div>
-                        <br>
 
 						<div class="form-group text-center col-lg-12 col-md-12 col-sm-12">
-							<button class="theme-btn btn-style-three" type="submit" name="submit-form"><span class="txt">Submit Request <img class="loading" width="30" src="{{url('/')}}/uploads/icon/loading.gif" alt="royaltech loading"/></span></button>
+							<button class="theme-btn btn-style-three" type="submit" name="submit-form">
+								<span class="txt">
+									<span>Submit Request</span>
+									<img class="loading" width="20" src="{{url('/')}}/uploads/icon/loading.gif" alt="Loading..." style="display: none; margin-left: 10px;"/>
+								</span>
+							</button>
 						</div>
 
 					</div>
@@ -569,23 +571,60 @@ breaking your savings account.
 
     <script>
         $(document).ready(function(){
-            $(".loading", this).css("visibility","hidden");
-        });
-        $('#laptop-for-hire').submit(function(e){
-
-            // Stop the form submitting
-            e.preventDefault();
-            $(".loading", this).css("visibility","visible");
-            $.ajax({
-                url: "{{url('laptops-for-hire')}}",
-                type: "POST",
-                data: $('#laptop-for-hire').serialize(),
-                success: function( response ) {
-                    $(".loading", this).css("visibility","hidden");
-                    alert('Your Request has been submitted successfully');
-
-                    document.getElementById("laptop-for-hire").reset();
-                }
+            $(".loading").hide();
+            
+            $('#laptop-for-hire').submit(function(e){
+                e.preventDefault();
+                
+                var $submitBtn = $(this).find('button[type="submit"]');
+                var $loading = $submitBtn.find('.loading');
+                var $txt = $submitBtn.find('.txt span:first');
+                
+                $loading.show();
+                $submitBtn.prop('disabled', true);
+                $txt.text('Submitting...');
+                
+                $('#form-message').hide();
+                
+                $.ajax({
+                    url: "{{url('laptops-for-hire')}}",
+                    type: "POST",
+                    data: $('#laptop-for-hire').serialize(),
+                    success: function(response) {
+                        $('#form-message')
+                            .removeClass('error')
+                            .addClass('success')
+                            .html('<strong>Success!</strong> Your request has been submitted successfully. We will get back to you soon.')
+                            .fadeIn();
+                        
+                        document.getElementById("laptop-for-hire").reset();
+                        
+                        $('html, body').animate({
+                            scrollTop: $('#form-message').offset().top - 100
+                        }, 500);
+                    },
+                    error: function(xhr) {
+                        var errorMsg = 'An error occurred. Please try again.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+                        
+                        $('#form-message')
+                            .removeClass('success')
+                            .addClass('error')
+                            .html('<strong>Error!</strong> ' + errorMsg)
+                            .fadeIn();
+                        
+                        $('html, body').animate({
+                            scrollTop: $('#form-message').offset().top - 100
+                        }, 500);
+                    },
+                    complete: function() {
+                        $loading.hide();
+                        $submitBtn.prop('disabled', false);
+                        $txt.text('Submit Request');
+                    }
+                });
             });
         });
     </script>

@@ -126,7 +126,7 @@
 					<div class="outer-box clearfix">
 
 						<!-- Cart Box -->
-						@include('front.carts')
+						{{-- @include('front.carts') --}}
 
 						<!-- Nav Btn -->
 						<div class="nav-btn navSidebar-button"><span class="icon flaticon-menu-2"></span></div>
@@ -167,7 +167,7 @@
 					<div class="outer-box clearfix">
 
 						<!-- Cart Box -->
-						@include('front.carts')
+						{{-- @include('front.carts') --}}
 
 						<!-- Search Btn -->
 						<div class="search-box-btn search-box-outer"><span class="icon fa fa-search"></span></div>
