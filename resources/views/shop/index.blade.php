@@ -26,7 +26,7 @@
                           <!--Sale Label-->
                           @if($item->pro_condition == "Ex-UK")
                              <span class="label label-new" >
-                              <i  class="fa fa-exclamation-triangle"> Ex-UK</i>
+                              <i> Ex-UK</i>
                            </span>
                           @else
                              <span class="label label-new">New</span>

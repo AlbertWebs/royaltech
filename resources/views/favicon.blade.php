@@ -12,6 +12,10 @@
 <link rel="icon" type="image/png" sizes="96x96" href="{{asset('favicon/favicon-96x96.png')}}">
 <link rel="icon" type="image/png" sizes="16x16" href="{{asset('favicon/favicon-16x16.png')}}">
 <link rel="manifest" href="{{asset('favicon/manifest.json')}}">
-<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RoyalTech">
+<meta name="msapplication-TileColor" content="#1c2c52">
 <meta name="msapplication-TileImage" content="{{asset('favicon/ms-icon-144x144.png')}}">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#1c2c52">
