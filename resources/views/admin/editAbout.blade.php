@@ -9,19 +9,19 @@
                 <a href="{{url('/')}}/admin/home" class="text-gray-400 hover:text-indigo-600 transition-colors">
                     <i class="fa fa-home"></i> Home
                 </a>
-            </li>
+                    </li>
             <li>
                 <span class="text-gray-500 mx-2">/</span>
-            </li>
+                    </li>
             <li>
                 <a href="{{url('/')}}/admin/SiteSettings" class="text-gray-400 hover:text-indigo-600">Site Settings</a>
-            </li>
+                    </li>
             <li>
                 <span class="text-gray-500 mx-2">/</span>
-            </li>
+                    </li>
             <li>
                 <span class="text-gray-900 font-medium">About Us</span>
-            </li>
+                    </li>
         </ol>
     </nav>
 </div>
@@ -36,10 +36,10 @@
             <div>
                 <h3 class="text-lg font-semibold text-white">Edit About Us</h3>
                 <p class="text-indigo-100 text-sm mt-1">Update your company's about page content</p>
-            </div>
-        </div>
-    </div>
-    
+                                </div>
+                                </div>
+                            </div>
+                            
     @foreach ($About as $item)
     <form method="POST" action="{{url('/')}}/admin/edit_About" enctype="multipart/form-data" class="px-6 py-6">
         @csrf
@@ -71,7 +71,7 @@
             <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-semibold hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md hover:shadow-lg transition-all">
                 <i class="fa fa-save mr-2"></i> Save Changes
             </button>
-        </div>
+    </div>
     </form>
     @endforeach
 </div>

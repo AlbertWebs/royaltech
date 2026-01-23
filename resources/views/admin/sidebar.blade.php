@@ -23,7 +23,7 @@
                 
                 @if($hasImage)
                     <img src="{{url('/')}}/uploads/users/{{Auth::user()->image}}" 
-                         alt="{{ Auth::user()->name }}" 
+                     alt="{{ Auth::user()->name }}" 
                          class="h-12 w-12 rounded-xl object-cover ring-2 ring-indigo-500/50 shadow-lg"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 ring-2 ring-indigo-500/50 shadow-lg flex items-center justify-center text-white font-bold text-lg hidden">

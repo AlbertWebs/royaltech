@@ -3,16 +3,49 @@
 @section('content')
 @foreach ($Service as $service)
 
+<style>
+/* Fix breadcrumb overlap with header */
+.page-title {
+    padding-top: 160px !important;
+    margin-top: 0 !important;
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 991px) {
+    .page-title {
+        padding-top: 140px !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .page-title {
+        padding-top: 120px !important;
+    }
+}
+</style>
 
 	<!--Page Title-->
     <section class="page-title">
 		<div class="pattern-layer-one" style="background-image: url('{{asset('corporate/images/background/pattern-16.png')}}')"></div>
     	<div class="auto-container">
+		<br><br><br>
 			<h2>{{$service->title}}</h2>
-			<ul class="page-breadcrumb">
-				<li><a href="{{url('/')}}">home</a></li>
-				<li>Center of Excellence</li>
-                <li>{{$service->title}}</li>
+			<ul class="page-breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
+				<li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+					<a href="{{url('/')}}" itemprop="item">
+						<span itemprop="name">Home</span>
+					</a>
+					<meta itemprop="position" content="1" />
+				</li>
+				<li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+					<span itemprop="name">Center of Excellence</span>
+					<meta itemprop="position" content="2" />
+				</li>
+				<li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+					<span itemprop="name">{{$service->title}}</span>
+					<meta itemprop="position" content="3" />
+				</li>
 			</ul>
         </div>
     </section>

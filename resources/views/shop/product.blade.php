@@ -468,4 +468,7 @@
 </div>
 <!-- //Main Container -->
 @endforeach
+
+<!-- E-Commerce Bottom Navigation -->
+@include('shop.bottom-nav')
 @endsection

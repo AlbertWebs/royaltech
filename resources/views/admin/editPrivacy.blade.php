@@ -15,13 +15,13 @@
             </li>
             <li>
                 <a href="{{url('/')}}/admin/privacy" class="text-gray-400 hover:text-indigo-600">Privacy Policies</a>
-            </li>
+                    </li>
             <li>
                 <span class="text-gray-500 mx-2">/</span>
-            </li>
+                    </li>
             <li>
                 <span class="text-gray-900 font-medium">Edit {{ $Privacy->title }}</span>
-            </li>
+                    </li>
         </ol>
     </nav>
 </div>
@@ -36,10 +36,10 @@
             <div>
                 <h3 class="text-lg font-semibold text-white">Edit Privacy Policy</h3>
                 <p class="text-indigo-100 text-sm mt-1">Update privacy policy: <strong>{{ $Privacy->title }}</strong></p>
-            </div>
-        </div>
-    </div>
-    
+                    </div>
+                                </div>
+                            </div>
+                       
     <form method="POST" action="{{url('/')}}/admin/edit_privacy/{{$Privacy->id}}" enctype="multipart/form-data" class="px-6 py-6">
         @csrf
         
@@ -59,8 +59,8 @@
                     class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors px-4 py-3.5 h-12"
                 >
                 <p class="mt-1 text-xs text-gray-500">A clear, descriptive title for this privacy policy section</p>
-            </div>
-
+                            </div>
+                            
             <!-- Content Editor -->
             <div>
                 <label for="article-ckeditor" class="block text-sm font-medium text-gray-700 mb-2">
@@ -103,7 +103,7 @@
             <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-semibold hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md hover:shadow-lg transition-all">
                 <i class="fa fa-save mr-2"></i> Save Changes
             </button>
-        </div>
+    </div>
     </form>
 </div>
 

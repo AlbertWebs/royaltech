@@ -93,13 +93,15 @@
       <script type="text/javascript" src="{{asset('commerce/js/themejs/addtocart.js')}}"></script>
       <script type="text/javascript" src="{{asset('commerce/js/themejs/application.js')}}"></script>
       <script type="text/javascript"><!--
-         // Check if Cookie exists
-         	if($.cookie('display')){
-         		view = $.cookie('display');
-         	}else{
-         		view = 'grid';
+         // Force grid view only - list view removed
+         	view = 'grid';
+         	if(typeof display === 'function') {
+         		display(view);
          	}
-         	if(view) display(view);
+         	// Remove any list view cookie
+         	if($.cookie('display') === 'list') {
+         		$.cookie('display', 'grid');
+         	}
          //-->
       </script>
 

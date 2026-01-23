@@ -126,7 +126,7 @@
                                 
                                 @if($hasImage)
                                     <img src="{{url('/')}}/uploads/users/{{Auth::user()->image}}" 
-                                         alt="{{ Auth::user()->name }}" 
+                                     alt="{{ Auth::user()->name }}" 
                                          class="h-9 w-9 rounded-full object-cover ring-2 ring-gray-200 group-hover:ring-indigo-300 transition-all"
                                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                     <div class="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 ring-2 ring-gray-200 group-hover:ring-indigo-300 transition-all flex items-center justify-center text-white font-semibold text-sm hidden">

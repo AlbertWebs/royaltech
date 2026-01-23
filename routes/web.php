@@ -58,6 +58,7 @@ Route::group(['prefix'=>'e-commerce'], function(){
         Route::get('/', [App\Http\Controllers\ShopController::class, 'cart'])->name('cart.list');
         Route::get('/checkout', [App\Http\Controllers\ShopController::class, 'checkout'])->name('checkout');
         Route::get('/remove/{id}', [App\Http\Controllers\ShopController::class, 'removeCart'])->name('removeCart');
+        Route::get('/update-quantity/{id}', [App\Http\Controllers\ShopController::class, 'updateCartQuantity'])->name('updateCartQuantity');
         Route::get('/add-to-cart/{slung}', [App\Http\Controllers\ShopController::class, 'add_to_cart'])->name('add-to-cart');
         Route::get('/add-to-wishlist/{slung}', [App\Http\Controllers\ShopController::class, 'add_to_wishlist'])->name('add-to-wishlist');
         Route::post('/checkout/update-data', [App\Http\Controllers\ShopController::class, 'update'])->name('checkout-update'); //Updates Data

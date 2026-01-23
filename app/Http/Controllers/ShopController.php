@@ -27,10 +27,10 @@ class ShopController extends Controller
         Session::forget('tags');
         $url = url('/');
         SEOMeta::setTitle('Laptops Shop In Kenya | RoyalTech Computers Limited | Laptops in Kenya');
-        SEOMeta::setDescription('Desktop Computers in Nairobi,Laptops,Audio and Video,Accessories,Bag Collection,Cameras and Accessories affordable computer accessories');
+        SEOMeta::setDescription('Affordable Laptops, Desktop Computers, Audio and Video, Accessories, Bag Collection, Cameras and Accessories affordable computer accessories');
         SEOMeta::setCanonical(''.$url.'/e-commerce');
 
-        OpenGraph::setDescription('Desktop Computers in Nairobi,Laptops,Audio and Video,Accessories,Bag Collection,Cameras and Accessories affordable computer accessories');
+        OpenGraph::setDescription('Affordable Laptops, Desktop Computers in Nairobi,Laptops,Audio and Video,Accessories,Bag Collection,Cameras and Accessories affordable computer accessories');
         OpenGraph::setTitle('Laptops Shop In Kenya | RoyalTech Computers Limited | Laptops in Kenya');
         OpenGraph::setUrl(''.$url.'/e-commerce');
         OpenGraph::addProperty('type', 'articles');
@@ -39,7 +39,7 @@ class ShopController extends Controller
         TwitterCard::setSite('@RoyaltechC');
 
         JsonLd::setTitle('Laptops Shop In Kenya | RoyalTech Computers Limited | Laptops in Kenya');
-        JsonLd::setDescription('Desktop Computers in Nairobi,Laptops,Audio and Video,Accessories,Bag Collection,Cameras and Accessories affordable computer accessories');
+        JsonLd::setDescription('Affordable Laptops,Desktop Computers in Nairobi,Laptops,Audio and Video,Accessories,Bag Collection,Cameras and Accessories affordable computer accessories');
         JsonLd::addImage(''.$url.'/uploads/Royaltech-Original-1.png');
         $Products = DB::table('products')->orderBy('id','DESC')->get();
         $title = "All Products";
@@ -53,7 +53,7 @@ class ShopController extends Controller
         $Products = DB::table('products')->where('slung',$slung)->get();
         foreach ($Products as $key => $value) {
             SEOMeta::setTitle(''.$value->name.' | RoyalTech Computers Limited | Laptops Hire in Kenya');
-            SEOMeta::setDescription('Desktop Computers in Nairobi,Laptops,Audio and Video,Accessories,Bag Collection,Cameras and Accessories affordable computer accessories');
+            SEOMeta::setDescription(''.$value->meta.' - Affordable Laptops, Desktop Computers in Nairobi,Laptops,Audio and Video,Accessories,Bag Collection,Cameras and Accessories affordable computer accessories');
             SEOMeta::setCanonical(''.$url.'/e-commerce/product/'.$slung.'');
 
             OpenGraph::setDescription('Desktop Computers in Nairobi,Laptops,Audio and Video,Accessories,Bag Collection,Cameras and Accessories affordable computer accessories');
@@ -235,6 +235,26 @@ class ShopController extends Controller
         \Cart::remove($id);
         session()->flash('success', 'Item Cart Remove Successfully !');
 
+        return redirect()->route('cart.list');
+    }
+
+    public function updateCartQuantity($id)
+    {
+        $quantity = request()->get('quantity', 1);
+        
+        if ($quantity < 1) {
+            $quantity = 1;
+        }
+        
+        \Cart::update($id, [
+            'quantity' => [
+                'relative' => false,
+                'value' => $quantity
+            ]
+        ]);
+        
+        session()->flash('success', 'Cart updated successfully!');
+        
         return redirect()->route('cart.list');
     }
 

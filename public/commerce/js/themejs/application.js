@@ -646,41 +646,36 @@ $(function() {
 });
 
 function display(view) {
+	// Force grid view only - list view removed
+	view = 'grid';
 	$('.products-list').removeClass('list grid').addClass(view);
 	$('.list-view .btn').removeClass('active');
-	if(view == 'list') {
-		$('.products-list .product-layout').addClass('col-lg-12');
-		$('.products-list .product-layout .left-block').addClass('col-md-4');
-		$('.products-list .product-layout .right-block').addClass('col-md-8');
-		$('.products-list .product-layout .item-desc').removeClass('hidden')
-		$('.list-view .' + view).addClass('active');
-		$.cookie('display', 'list');
-	}else{
-		$('.products-list .product-layout').removeClass('col-lg-12');
-		$('.products-list .product-layout .left-block').removeClass('col-md-4');
-		$('.products-list .product-layout .right-block').removeClass('col-md-8');
-		$('.products-list .product-layout .item-desc').addClass('hidden');
-		$('.list-view .' + view).addClass('active');
-		$.cookie('display', 'grid');
-	}
+	// Always use grid layout
+	$('.products-list .product-layout').removeClass('col-lg-12');
+	$('.products-list .product-layout .left-block').removeClass('col-md-4');
+	$('.products-list .product-layout .right-block').removeClass('col-md-8');
+	$('.products-list .product-layout .item-desc').addClass('hidden');
+	$('.list-view .' + view).addClass('active');
+	$.cookie('display', 'grid');
 }
 
 	$(document).ready(function () {
-
-		// Click Button
-		$('.list-view .btn').each(function() {
-			var ua = navigator.userAgent,
-			event = (ua.match(/iPad/i)) ? 'touchstart' : 'click';
-			$(this).bind(event, function() {
-				$(this).addClass(function() {
-					if($(this).hasClass('active')) return '';
-					return 'active';
-				});
-				$(this).siblings('.btn').removeClass('active');
-				$catalog_mode = $(this).data('view');
-				display($catalog_mode);
-			});
-
+		// List view removed - only grid view is available
+		// Force grid view on page load
+		display('grid');
+		
+		// Disable list view toggle buttons if they exist
+		$('.list-view .btn[data-view="list"]').off('click touchstart').on('click touchstart', function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			// Force grid view
+			display('grid');
+			return false;
+		});
+		
+		// Ensure grid view button works
+		$('.list-view .btn[data-view="grid"]').on('click touchstart', function() {
+			display('grid');
 		});
 	});
 

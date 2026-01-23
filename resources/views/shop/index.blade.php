@@ -14,18 +14,20 @@
           <div class="products-category">
              
              <!--changed listings-->
-             <div class="products-list row list">
+             <div class="products-list row grid">
                 @foreach ($Products as $item)
                 <div class="product-layout col-md-4 col-sm-4 col-xs-6">
                     <div class="product-item-container">
                        <div class="left-block">
                           <div class="product-image-container lazy second_img ">
                              <img data-src="{{url('/')}}/uploads/products/{{$item->image_one}}" src="{{url('/')}}/uploads/products/{{$item->image_one}}"  alt="{{$item->name}}" class="img-responsive product-img" />
-                             <img data-src="{{url('/')}}/uploads/products/{{$item->image_two}}" src="{{url('/')}}/uploads/products/{{$item->image_two}}"  alt="{{$item->name}}" class="img_0 img-responsive" />
+                             <img data-src="{{url('/')}}/uploads/products/{{!empty($item->image_two) ? $item->image_two : $item->image_one}}" src="{{url('/')}}/uploads/products/{{!empty($item->image_two) ? $item->image_two : $item->image_one}}"  alt="{{$item->name}}" class="img_0 img-responsive" />
                           </div>
                           <!--Sale Label-->
                           @if($item->pro_condition == "Ex-UK")
-                             <span class="label label-new" style="background-color: #e74c3c; color: #ffffff;">Ex-UK</span>
+                             <span class="label label-new" >
+                              <i  class="fa fa-exclamation-triangle"> Ex-UK</i>
+                           </span>
                           @else
                              <span class="label label-new">New</span>
                           @endif
@@ -61,12 +63,28 @@
                                     <span class="label label-percent">-{{ceil($Per)}}%</span>
                                 @endif
                              </div>
-                             <div class="description item-desc hidden">
-                                <p>{{$item->meta}} </p>
-                             </div>
+                             {{-- Description removed - list view disabled --}}
                           </div>
                           <div class="button-group">
-                             <a href="{{url('/')}}/e-commerce/shopping-cart/add-to-cart/{{$item->id}}" data-url="{{url('/')}}/e-commerce/shopping-cart/add-to-cart/{{$item->id}}" class="addToCart add-to-cart" type="button" data-toggle="tooltip" title="Add to Cart" onclick="cart.add('{{$item->id}}', '1');"><i class="fa fa-shopping-cart"></i> <span class="hidden-xs">Add to Cart</span></a>
+                             <a href="{{url('/')}}/e-commerce/shopping-cart/add-to-cart/{{$item->id}}" data-url="{{url('/')}}/e-commerce/shopping-cart/add-to-cart/{{$item->id}}" class="addToCarts add-to-cart" type="button" data-toggle="tooltip" title="Add to Cart" onclick="cart.add('{{$item->id}}', '1');"><i class="fa fa-shopping-cart"></i> <span class="hidden-xs">Add to Cart</span></a>
+                             
+                             <?php
+                                $productName = urlencode($item->name);
+                                $productLink = url('/') . '/e-commerce/product/' . $item->slung;
+                                $productPrice = $item->price_raw == $item->price ? $item->price_raw : $item->price;
+                                $originalPrice = $item->price_raw != $item->price ? $item->price_raw : '';
+                                $whatsappMessage = "Hello! I would like to buy this product:\n\n";
+                                $whatsappMessage .= "*" . $item->name . "*\n\n";
+                                if($originalPrice) {
+                                    $whatsappMessage .= "Price: KES " . number_format($productPrice, 2) . "\n";
+                                    $whatsappMessage .= "Original Price: KES " . number_format($originalPrice, 2) . "\n\n";
+                                } else {
+                                    $whatsappMessage .= "Price: KES " . number_format($productPrice, 2) . "\n\n";
+                                }
+                                $whatsappMessage .= "Product Link: " . $productLink;
+                                $whatsappMessage = urlencode($whatsappMessage);
+                             ?>
+                             <a href="https://wa.me/254724404935?text={{$whatsappMessage}}" target="_blank" class="buy-now-whatsapp" type="button" data-toggle="tooltip" title="Buy Now on WhatsApp"><i class="fa fa-whatsapp"></i> <span class="hidden-xs">Buy Now</span></a>
 
                              {{-- <button data-product="{{url('/')}}/e-commerce/shopping-cart/add-to-wishlist/{{$item->id}}" class="wishlist add-to-wishlist" type="button" data-toggle="tooltip" title="Add to Wish List" onclick="wishlist.add('42');" style="min-height:38px !important; borders:3px solid #000;"><i class="fa fa-heart" ></i></button> --}}
                              {{-- <button class="compare" type="button" data-toggle="tooltip" title="Compare this Product" onclick="compare.add('42');"><i class="fa fa-exchange"></i></button> --}}

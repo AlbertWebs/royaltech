@@ -94,9 +94,9 @@
 		<!--Header-Upper-->
 		@if(request()->is('/') || request()->is(''))
 			@include('front.header-home')
-		@else
+                        @else
 			@include('front.header-others')
-		@endif
+                        @endif
 
 		<!-- Sticky Header  -->
         <div class="sticky-header">

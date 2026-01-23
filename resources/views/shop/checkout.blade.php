@@ -1,18 +1,25 @@
-@extends('shop.master-checkout')
+@extends('shop.master-cart')
 
 @section('content')
+<!--Page Title-->
+<section class="page-title">
+    <div class="pattern-layer-one" style="background-image: url('{{asset('corporate/images/background/pattern-16.png')}}')"></div>
+    <div class="auto-container">
+        <h2>Checkout</h2>
+        <ul class="page-breadcrumb">
+            <li><a href="{{url('/')}}">home</a></li>
+            <li>Shop Online</li>
+            <li>Checkout</li>
+        </ul>
+    </div>
+</section>
+<!--End Page Title-->
+
 <!-- Main Container  -->
-<div class="main-container container">
-    <ul class="breadcrumb">
-        <li><a href="#"><i class="fa fa-home"></i></a></li>
-        <li><a href="#">Checkout</a></li>
-
-    </ul>
-
+<div class="main-container container" style="padding-top: 40px;">
     <div class="row">
         <!--Middle Part Start-->
         <div id="content" class="col-sm-12">
-          <h2 class="title">Checkout</h2>
           <div class="so-onepagecheckout ">
             <div class="col-left col-sm-3">
             <form action="{{url('/')}}/checkout/make-payment" id="updateUser">
@@ -199,4 +206,30 @@
     </div>
 </div>
 <!-- //Main Container -->
+
+<!-- E-Commerce Bottom Navigation -->
+@include('shop.bottom-nav')
+
+@section('scripts')
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".loading").hide();
+        // Process Update Details Ajax
+        $("#updateUser").submit(function(stay){
+            stay.preventDefault();
+            $(".loading").show();
+            var formdata = $(this).serialize();
+            $.ajax({
+                type: 'POST',
+                url: "{{ url('/') }}/e-commerce/shopping-cart/checkout/update-data",
+                data: formdata,
+                success: function (data) {
+                    window.location = "{{url('/')}}/e-commerce/shopping-cart/checkout/make-payment";
+                },
+            });
+            stay.preventDefault();
+        });
+    });
+</script>
+@endsection
 @endsection
