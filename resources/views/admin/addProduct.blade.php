@@ -1,240 +1,433 @@
 @extends('admin.master')
+
 @section('content')
-<!-- Remember to include jQuery :) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+<!-- Breadcrumbs -->
+<div class="mb-6">
+    <nav class="flex" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2">
+            <li>
+                <a href="{{url('/')}}/admin/home" class="text-gray-400 hover:text-indigo-600 transition-colors">
+                    <i class="fa fa-home"></i> Home
+                </a>
+            </li>
+            <li>
+                <span class="text-gray-500 mx-2">/</span>
+            </li>
+            <li>
+                <a href="{{url('/')}}/admin/products" class="text-gray-400 hover:text-indigo-600">Products</a>
+            </li>
+            <li>
+                <span class="text-gray-500 mx-2">/</span>
+            </li>
+            <li>
+                <span class="text-gray-900 font-medium">Add New Product</span>
+            </li>
+        </ol>
+    </nav>
+</div>
 
-<!-- jQuery Modal -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
-<style>
-    .modal a.close-modal{
-        top:0px !important;
-        right:0px !important;
-    }
-</style>
-<!--== BODY CONTNAINER ==-->
- <div class="container-fluid sb2">
-    <div class="row">
-        @include('admin.sidebar')
-
-        <!--== BODY INNER CONTAINER ==-->
-
-        <div class="sb2-2">
-            <div class="sb2-2-2">
-                <ul>
-                    <li><a href="{{url('/')}}"><i class="fa fa-home" aria-hidden="true"></i> Home</a>
-                    </li>
-                    <li class="active-bre"><a href="#"> Add New Product</a>
-                    </li>
-                    <li class="page-back"><a href="{{url('/')}}/admin/products"><i class="fa fa-backward" aria-hidden="true"></i> All Products</a>
-                    </li>
-                </ul>
-
+<!-- Form Card -->
+<div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200">
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 border-b border-indigo-800">
+        <div class="flex items-center">
+            <div class="bg-white/20 rounded-lg p-2 mr-3">
+                <i class="fa fa-cube text-white text-xl"></i>
             </div>
-            <div class="sb2-2-add-blog sb2-2-1">
-                <div class="box-inn-sp">
-                    <div class="inn-title">
-                        <h4>Add Product</h4>
-                        <center>
-                            @if(Session::has('message'))
-                                          <div class="alert alert-success">{{ Session::get('message') }}</div>
-                           @endif
+            <div>
+                <h3 class="text-lg font-semibold text-white">Add New Product</h3>
+                <p class="text-indigo-100 text-sm mt-1">Create a new product for your store</p>
+            </div>
+        </div>
+    </div>
+    
+    <form method="POST" action="{{url('/')}}/admin/add_Product" enctype="multipart/form-data" class="px-6 py-6" x-data="{ formSubmitting: false }" @submit="formSubmitting = true">
+        @csrf
+        
+        <!-- Basic Information Section -->
+        <div class="mb-8">
+            <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+                <div class="bg-indigo-100 rounded-lg p-2 mr-3">
+                    <i class="fa fa-info-circle text-indigo-600"></i>
+                </div>
+                <h4 class="text-base font-semibold text-gray-900">Basic Information</h4>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <!-- Product Name -->
+                <div class="md:col-span-2">
+                    <x-admin.form.input 
+                        name="title" 
+                        label="Product Name" 
+                        placeholder="e.g., Apple MacBook Pro 16-inch"
+                        required
+                    />
+                    <p class="mt-1 text-xs text-gray-500 flex items-center">
+                        <i class="fa fa-lightbulb-o mr-1"></i> Use a clear, descriptive name that customers will understand
+                    </p>
+                </div>
 
-                           @if(Session::has('messageError'))
-                                          <div class="alert alert-danger">{{ Session::get('messageError') }}</div>
-                           @endif
-                        </center>
-                    </div>
-                    <div class="bor">
-                        <form method="POST" action="{{url('/')}}/admin/add_Product" enctype="multipart/form-data">
-                            {{csrf_field()}}
-                            <div class="row">
-                                <div class="input-field col s12">
-                                    <input autocomplete="off" name="title" id="list-title" type="text" class="validate" required>
-                                    <label for="list-title">Product Name</label>
-                                </div>
-                                <div class="input-field col s12">
-                                    <input autocomplete="off" name="price" id="list-title"  type="number" class="validate" required>
-                                    <label for="list-title">Product Price</label>
-                                </div>
-                                {{-- <div class="input-field col s12">
-                                    <input autocomplete="off" name="sku" id="list-title" type="text" placeholder="SKU-01" class="validate" required>
-                                    <label for="list-title">SKU</label>
-                                </div> --}}
-                                <div class="input-field col s12">
-                                    <div class="file-field">
-                                        <div class="btn">
-                                            <span>File(600px by 600px)</span>
-                                            <input required name="image_one" type="file">
-                                        </div>
-                                        <div class="file-path-wrapper">
-                                            <input  class="file-path validate" type="text" placeholder="Upload Product Main Image, Size 600px by 600px">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
+                <!-- Product Price -->
+                <div>
+                    <x-admin.form.input 
+                        name="price" 
+                        label="Product Price" 
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="0.00"
+                        required
+                    />
+                    <p class="mt-1 text-xs text-gray-500">Enter the price in your base currency</p>
+                </div>
 
-                                {{--  --}}
-                                <div class="input-field col s12">
-                                    <select required name="category" class="icons" id="mydiv">
-                                        <option value="" disabled selected>Choose your Category</option>
-                                        @foreach ($Category as $Categories)
-                                        <option value="{{$Categories->id}}" data-icon="{{url('/')}}/uploads/categories/{{$Categories->image}}" class="circle">{{$Categories->title}}</option>
-                                        @endforeach
-                                    </select>
-                                    <label>Choose Category</label>
-                                </div>
-                                <a href="#ex1" rel="modal:open"> <strong>+ Add New Category</strong> </a>
-                                {{--  --}}
-                                <div class="section-space col s12"></div>
-                            </div>
+                <!-- SKU -->
+                <div>
+                    <x-admin.form.input 
+                        name="sku" 
+                        label="SKU (Stock Keeping Unit)" 
+                        placeholder="Leave blank for auto-generation"
+                    />
+                    <p class="mt-1 text-xs text-gray-500 flex items-center">
+                        <i class="fa fa-info-circle mr-1"></i> Optional - will be auto-generated if left blank
+                    </p>
+                </div>
+            </div>
+        </div>
 
-                            <div class="row">
+        <!-- Product Details Section -->
+        <div class="mb-8">
+            <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+                <div class="bg-purple-100 rounded-lg p-2 mr-3">
+                    <i class="fa fa-tags text-purple-600"></i>
+                </div>
+                <h4 class="text-base font-semibold text-gray-900">Product Details</h4>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <!-- Category -->
+                <div>
+                    @php
+                        $categoryOptions = [];
+                        foreach($Category as $cat) {
+                            $categoryOptions[$cat->id] = $cat->title;
+                        }
+                    @endphp
+                    <x-admin.form.select 
+                        name="category" 
+                        label="Category" 
+                        :options="$categoryOptions"
+                        placeholder="Select a category"
+                        required
+                    />
+                    <p class="mt-1 text-xs text-gray-500">Choose the most appropriate category</p>
+                </div>
 
-                                {{--  --}}
-                                <div class="input-field col s12">
-                                    <select required name="brand" class="icons" id="mydiv">
-                                        <option value="" disabled selected>Choose your Brand</option>
-                                        <?php $Brand = DB::table('brands')->get(); ?>
-                                        @foreach ($Brand as $brands)
-                                        <option value="{{$brands->title}}" data-icon="{{url('/')}}/uploads/brands/{{$brands->image}}" class="circle">{{$brands->title}}</option>
-                                        @endforeach
-                                    </select>
-                                    <label>Choose Brands</label>
-                                </div>
+                <!-- Brand -->
+                <div>
+                    @php
+                        $Brand = DB::table('brands')->get();
+                        $brandOptions = [];
+                        foreach($Brand as $brand) {
+                            $brandOptions[$brand->title] = $brand->title;
+                        }
+                    @endphp
+                    <x-admin.form.select 
+                        name="brand" 
+                        label="Brand" 
+                        :options="$brandOptions"
+                        placeholder="Select a brand"
+                        required
+                    />
+                    <p class="mt-1 text-xs text-gray-500">Select the product manufacturer</p>
+                </div>
 
-                                {{--  --}}
-                                <div class="section-space col s12"></div>
-                            </div>
+                <!-- Product Condition -->
+                <div>
+                    <x-admin.form.select 
+                        name="condition" 
+                        label="Product Condition" 
+                        :options="['Ex-UK' => 'Ex-UK', 'New' => 'New']"
+                        placeholder="Select condition"
+                        required
+                    />
+                    <p class="mt-1 text-xs text-gray-500">Ex-UK: Previously used, New: Brand new</p>
+                </div>
 
-                            <div class="row">
-
-                                {{--  --}}
-                                <div class="input-field col s12">
-                                    <select required name="condition" class="icons" id="mydiv">
-                                        <option value="" disabled selected>Choose Product Condition</option>
-
-                                        <option value="Ex-UK"  class="circle">Ex-Uk</option>
-                                        <option value="New"  class="circle">New</option>
-
-                                    </select>
-                                    <label>Product Condition</label>
-                                </div>
-
-                                {{--  --}}
-                                <div class="section-space col s12"></div>
-                            </div>
-
-
-                            <div class="row">
-                                <div class="input-field col s12">
-                                    <textarea required name="meta" class="materialize-textarea"></textarea>
-                                    <label for="textarea1">Meta Descriptions:</label>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="input-field col s12">
-                                    <textarea required id="article-ckeditor" name="content" class="materialilze-textarea" placeholder="content"></textarea>
-                                    {{-- <label for="textarea1">Blog Descriptions:</label> --}}
-                                </div>
-                            </div><br><br>
-
-
-                                <script src="{{ asset('ckeditor/ckeditor.js')}}"></script>
-                                <script>CKEDITOR.replace('article-ckeditor');</script>
-
-
-
-                            <div class="row">
-                                <div class="input-field col s12">
-                                    <input required autocomplete="off" value="{{Auth::user()->name }}" id="post-auth" name="author" type="text" class="validate">
-                                    <label for="post-auth">Author Name</label>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="input-field col s12">
-                                    <input  type="submit" class="waves-effect waves-light btn-large" value="Submit">
-                                </div>
-                            </div>
-                        </form>
+                <!-- Stock Status -->
+                <div>
+                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                            <i class="fa fa-check-circle mr-2 text-green-600"></i> Stock Status
+                        </label>
+                        <x-admin.form.toggle 
+                            name="stock" 
+                            label="In Stock"
+                            :value="true"
+                        />
+                        <p class="mt-2 text-xs text-gray-500">Toggle to mark product as available</p>
                     </div>
                 </div>
             </div>
         </div>
-        <!--== BODY INNER CONTAINER ==-->
 
-    </div>
-</div>
+        <!-- SEO & Description Section -->
+        <div class="mb-8">
+            <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+                <div class="bg-green-100 rounded-lg p-2 mr-3">
+                    <i class="fa fa-search text-green-600"></i>
+                </div>
+                <h4 class="text-base font-semibold text-gray-900">SEO & Description</h4>
+            </div>
+            
+            <!-- Meta Description -->
+            <div class="mt-4" x-data="{ metaLength: 0 }">
+                <label for="meta" class="block text-sm font-medium text-gray-700 mb-2">
+                    Meta Description <span class="text-red-500">*</span>
+                    <span class="text-gray-500 text-xs font-normal ml-2">(For search engines)</span>
+                </label>
+                <textarea 
+                    name="meta"
+                    id="meta"
+                    rows="3"
+                    required
+                    placeholder="Enter a brief meta description for search engines (150-160 characters recommended)"
+                    class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 sm:text-sm transition-colors px-4 py-3.5"
+                    @input="metaLength = $event.target.value.length"
+                ></textarea>
+                <div class="mt-1 flex items-center justify-between">
+                    <p class="text-xs text-gray-500">
+                        <i class="fa fa-info-circle mr-1"></i> This appears in search engine results
+                    </p>
+                    <span class="text-xs" :class="metaLength > 160 ? 'text-red-500' : 'text-gray-500'">
+                        <span x-text="metaLength"></span>/160 characters
+                    </span>
+                </div>
+            </div>
 
-{{--  --}}
-<div id="ex1" class="modal">
-    <div class="sb2-2-3">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="box-inn-sp">
-                    <div class="inn-title">
-                        <h4>Add New Category</h4>
+            <!-- Content (CKEditor) -->
+            <div class="mt-6">
+                <label for="article-ckeditor" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fa fa-file-text-o mr-2"></i> Product Description <span class="text-red-500">*</span>
+                </label>
+                <textarea 
+                    id="article-ckeditor" 
+                    name="content" 
+                    class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 sm:text-sm bg-white px-4 py-3.5 transition-colors min-h-[300px]"
+                    rows="12"
+                    placeholder="Enter detailed product description including features, specifications, and benefits..."
+                    required
+                ></textarea>
+                <p class="mt-2 text-xs text-gray-500 flex items-center">
+                    <i class="fa fa-lightbulb-o mr-1"></i> Use the rich text editor to format your description with headings, lists, and images
+                </p>
+                <script>
+                    if (typeof CKEDITOR !== 'undefined') {
+                        CKEDITOR.replace('article-ckeditor', {
+                            height: 400,
+                            toolbar: [
+                                { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike'] },
+                                { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Blockquote'] },
+                                { name: 'links', items: ['Link', 'Unlink'] },
+                                { name: 'insert', items: ['Image', 'Table'] },
+                                { name: 'styles', items: ['Format', 'Font', 'FontSize'] },
+                                { name: 'colors', items: ['TextColor', 'BGColor'] },
+                                { name: 'tools', items: ['Maximize', 'Source'] }
+                            ]
+                        });
+                    }
+                </script>
+            </div>
+        </div>
+
+        <!-- Product Images Section -->
+        <div class="mb-8">
+            <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+                <div class="bg-pink-100 rounded-lg p-2 mr-3">
+                    <i class="fa fa-image text-pink-600"></i>
+                </div>
+                <h4 class="text-base font-semibold text-gray-900">Product Images</h4>
+            </div>
+            
+            <p class="mt-2 mb-4 text-sm text-gray-600 flex items-center">
+                <i class="fa fa-info-circle mr-2 text-indigo-500"></i> 
+                Upload high-quality images (600x600px recommended). First image is required and will be used as the main product image.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Image One -->
+                <div x-data="{ preview: '', fileName: '', isDragging: false }" 
+                     @dragover.prevent="isDragging = true" 
+                     @dragleave.prevent="isDragging = false"
+                     @drop.prevent="isDragging = false; handleDrop($event, 'image_one')">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Main Image <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-1 flex items-center mb-3">
+                        <label for="image_one" class="cursor-pointer">
+                            <span class="inline-flex items-center px-4 py-2 border-2 border-indigo-300 rounded-lg shadow-sm text-sm font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors">
+                                <i class="fa fa-upload mr-2"></i> Upload
+                            </span>
+                            <input 
+                                type="file"
+                                name="image_one"
+                                id="image_one"
+                                accept="image/*"
+                                required
+                                class="sr-only"
+                                @change="fileName = $event.target.files[0]?.name || ''; if ($event.target.files[0]) { const reader = new FileReader(); reader.onload = (e) => preview = e.target.result; reader.readAsDataURL($event.target.files[0]); }"
+                            >
+                        </label>
+                        <span x-show="fileName" class="ml-3 text-sm text-gray-600 font-medium truncate max-w-[120px]" x-text="fileName"></span>
                     </div>
-                    <div class="tab-inn">
-                        <form method="POST" id="categoryAddForm">
-                            {{csrf_field()}}
-                            <div class="row">
-                                <div class="input-field col s12">
-                                    <input autocomplete="off" name="title" id="CategoryTitle" type="text" class="validate">
-                                    <label for="CategoryName">Category Name</label>
-                                </div>
+                    <div class="mt-4 bg-gray-200 rounded-lg border-2 border-dashed transition-colors" 
+                         :class="isDragging ? 'border-indigo-400 bg-indigo-50' : 'border-gray-200'"
+                         style="height: 160px;">
+                        <div class="h-full flex items-center justify-center p-4 relative">
+                            <img x-show="preview" :src="preview" alt="Preview" class="max-h-full max-w-full w-auto h-auto object-contain rounded">
+                            <div x-show="!preview" class="text-center">
+                                <i class="fa fa-image text-gray-400 text-3xl mb-2"></i>
+                                <p class="text-gray-400 text-xs">No image</p>
                             </div>
-                            <div class="row" id="submitButton">
-                                <div class="input-field col s12">
-                                    <input  type="submit" class="waves-effect waves-light btn-large" value="Submit">
-                                </div>
-                            </div>
+                            <span x-show="preview" class="absolute top-2 right-2 bg-indigo-600 text-white text-xs font-semibold px-2 py-1 rounded shadow-lg">
+                                <i class="fa fa-check mr-1"></i> Ready
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-                            <div class="tab-inn" id="loading-bar">
-                                <div class="progress">
-                                    <div class="indeterminate"></div>
-                                </div>
+                <!-- Image Two -->
+                <div x-data="{ preview: '', fileName: '', isDragging: false }" 
+                     @dragover.prevent="isDragging = true" 
+                     @dragleave.prevent="isDragging = false"
+                     @drop.prevent="isDragging = false; handleDrop($event, 'image_two')">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Image Two</label>
+                    <div class="mt-1 flex items-center mb-3">
+                        <label for="image_two" class="cursor-pointer">
+                            <span class="inline-flex items-center px-4 py-2 border-2 border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                <i class="fa fa-upload mr-2"></i> Upload
+                            </span>
+                            <input 
+                                type="file"
+                                name="image_two"
+                                id="image_two"
+                                accept="image/*"
+                                class="sr-only"
+                                @change="fileName = $event.target.files[0]?.name || ''; if ($event.target.files[0]) { const reader = new FileReader(); reader.onload = (e) => preview = e.target.result; reader.readAsDataURL($event.target.files[0]); }"
+                            >
+                        </label>
+                        <span x-show="fileName" class="ml-3 text-sm text-gray-600 font-medium truncate max-w-[120px]" x-text="fileName"></span>
+                    </div>
+                    <div class="mt-4 bg-gray-200 rounded-lg border-2 border-dashed transition-colors" 
+                         :class="isDragging ? 'border-indigo-400 bg-indigo-50' : 'border-gray-200'"
+                         style="height: 160px;">
+                        <div class="h-full flex items-center justify-center p-4 relative">
+                            <img x-show="preview" :src="preview" alt="Preview" class="max-h-full max-w-full w-auto h-auto object-contain rounded">
+                            <div x-show="!preview" class="text-center">
+                                <i class="fa fa-image text-gray-400 text-3xl mb-2"></i>
+                                <p class="text-gray-400 text-xs">Optional</p>
                             </div>
+                        </div>
+                    </div>
+                </div>
 
-                        </form>
+                <!-- Image Three -->
+                <div x-data="{ preview: '', fileName: '', isDragging: false }" 
+                     @dragover.prevent="isDragging = true" 
+                     @dragleave.prevent="isDragging = false"
+                     @drop.prevent="isDragging = false; handleDrop($event, 'image_three')">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Image Three</label>
+                    <div class="mt-1 flex items-center mb-3">
+                        <label for="image_three" class="cursor-pointer">
+                            <span class="inline-flex items-center px-4 py-2 border-2 border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                <i class="fa fa-upload mr-2"></i> Upload
+                            </span>
+                            <input 
+                                type="file"
+                                name="image_three"
+                                id="image_three"
+                                accept="image/*"
+                                class="sr-only"
+                                @change="fileName = $event.target.files[0]?.name || ''; if ($event.target.files[0]) { const reader = new FileReader(); reader.onload = (e) => preview = e.target.result; reader.readAsDataURL($event.target.files[0]); }"
+                            >
+                        </label>
+                        <span x-show="fileName" class="ml-3 text-sm text-gray-600 font-medium truncate max-w-[120px]" x-text="fileName"></span>
+                    </div>
+                    <div class="mt-4 bg-gray-200 rounded-lg border-2 border-dashed transition-colors" 
+                         :class="isDragging ? 'border-indigo-400 bg-indigo-50' : 'border-gray-200'"
+                         style="height: 160px;">
+                        <div class="h-full flex items-center justify-center p-4 relative">
+                            <img x-show="preview" :src="preview" alt="Preview" class="max-h-full max-w-full w-auto h-auto object-contain rounded">
+                            <div x-show="!preview" class="text-center">
+                                <i class="fa fa-image text-gray-400 text-3xl mb-2"></i>
+                                <p class="text-gray-400 text-xs">Optional</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Four -->
+                <div x-data="{ preview: '', fileName: '', isDragging: false }" 
+                     @dragover.prevent="isDragging = true" 
+                     @dragleave.prevent="isDragging = false"
+                     @drop.prevent="isDragging = false; handleDrop($event, 'image_four')">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Image Four</label>
+                    <div class="mt-1 flex items-center mb-3">
+                        <label for="image_four" class="cursor-pointer">
+                            <span class="inline-flex items-center px-4 py-2 border-2 border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                <i class="fa fa-upload mr-2"></i> Upload
+                            </span>
+                            <input 
+                                type="file"
+                                name="image_four"
+                                id="image_four"
+                                accept="image/*"
+                                class="sr-only"
+                                @change="fileName = $event.target.files[0]?.name || ''; if ($event.target.files[0]) { const reader = new FileReader(); reader.onload = (e) => preview = e.target.result; reader.readAsDataURL($event.target.files[0]); }"
+                            >
+                        </label>
+                        <span x-show="fileName" class="ml-3 text-sm text-gray-600 font-medium truncate max-w-[120px]" x-text="fileName"></span>
+                    </div>
+                    <div class="mt-4 bg-gray-200 rounded-lg border-2 border-dashed transition-colors" 
+                         :class="isDragging ? 'border-indigo-400 bg-indigo-50' : 'border-gray-200'"
+                         style="height: 160px;">
+                        <div class="h-full flex items-center justify-center p-4 relative">
+                            <img x-show="preview" :src="preview" alt="Preview" class="max-h-full max-w-full w-auto h-auto object-contain rounded">
+                            <div x-show="!preview" class="text-center">
+                                <i class="fa fa-image text-gray-400 text-3xl mb-2"></i>
+                                <p class="text-gray-400 text-xs">Optional</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-{{-- <a href="#" rel="modal:close">Close</a> --}}
-<script type="text/javascript">
-        // A $( document ).ready() block.
-    $( document ).ready(function() {
-        $('#loading-bar').hide();
-    });
+        </div>
 
-    $('#categoryAddForm').on('submit',function(event){
-        event.preventDefault();
-        $('#loading-bar').show();
-
-
-        let title = $('#CategoryTitle').val();
-
-
-        $.ajax({
-          url: "{{url('/')}}/admin/addCategoryAjaxRequest",
-          type:"POST",
-          data:{
-            "_token": "{{ csrf_token() }}",
-            title:title,
-          },
-          success:function(response){
-            $('#loading-bar').hide();
-            $('#submitButton').html('<center><span class="alert-success text-center">Category Added Successfully! Refreshing page...........</span></center>').delay(3000);
-            $('#categoryAddForm')[0].reset();
-            setTimeout(function() {
-                location.reload();
-            }, 5000);
-          },
-         });
-        });
-      </script>
+        <!-- Submit Button -->
+        <div class="mt-8 flex justify-end space-x-3 border-t border-gray-200 pt-6">
+            <a href="{{url('/')}}/admin/products" class="px-6 py-2.5 border-2 border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all">
+                <i class="fa fa-times mr-2"></i> Cancel
+            </a>
+            <button type="submit" 
+                    :disabled="formSubmitting"
+                    class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-semibold hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fa mr-2" :class="formSubmitting ? 'fa-spinner fa-spin' : 'fa-save'"></i> 
+                <span x-text="formSubmitting ? 'Adding Product...' : 'Add Product'"></span>
+            </button>
+        </div>
+    </form>
 </div>
-{{--  --}}
+
+<script>
+function handleDrop(event, inputId) {
+    const file = event.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+        const input = document.getElementById(inputId);
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        input.files = dataTransfer.files;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+}
+</script>
+
 @endsection

@@ -14,13 +14,13 @@
 <meta name="theme-color" content="#1c2c52">
 
 {{--  --}}
-<title>Laptops for Leasing in Nairobi Kenya | RoyalTech Computers Limited - Laptops for Hire</title>
+<title>Laptops for Leasing in Nairobi Kenya | RoyalTech Computers Limited - Laptops for Hire - Laptops Rentals Etc</title>
 <meta name="description" content="Desktop Computers in Nairobi,Laptops,Audio and Video,Accessories,Bag Collection,Cameras and Accessories affordable computer accessories">
 <link rel="canonical" href="https://royaltech.co.ke/laptops-for-hire"/>
 <meta name="description" content="Desktop Computers in Nairobi,Laptops,Audio and Video,Accessories,Bag Collection,Cameras and Accessories affordable computer accessories">
 
 <meta property="og:description" content="Leasing Laptops in Nairobi,Desktop Computers in Nairobi,Laptops,Audio and Video,Accessories,Bag Collection,Cameras and Accessories affordable computer accessories" />
-<meta property="og:title" content="Laptops For Leasing in Nairobi Kenya | RoyalTech Computers Limited" />
+<meta property="og:title" content="Laptops For Leasing in Nairobi Kenya | RoyalTech Computers Limited - Laptops Rentals Etc" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://royaltech.co.ke/laptops-for-hire" />
 <meta property="og:image" content="{{url('/')}}/uploads/hire.jpg" />

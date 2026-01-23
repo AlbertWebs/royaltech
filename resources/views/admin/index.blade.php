@@ -1,367 +1,297 @@
 @extends('admin.master')
+
 @section('content')
-<!--== BODY CONTNAINER ==-->
- <div class="container-fluid sb2">
-    <div class="row">
-        @include('admin.sidebar')
+@php
+    $productCount = DB::table('products')->count();
+    $categoryCount = DB::table('categories')->count();
+    $brandCount = DB::table('brands')->count();
+    $serviceCount = DB::table('services')->count();
+    $blogCount = DB::table('blogs')->count();
+    $userCount = DB::table('users')->count();
+    $messageCount = DB::table('messages')->count();
+    $sliderCount = DB::table('sliders')->count();
+@endphp
 
-        <!--== BODY INNER CONTAINER ==-->
-        <div class="sb2-2">
-            <!--== breadcrumbs ==-->
-            <div class="sb2-2-2">
-                <center>
-                    @if(Session::has('message'))
-                                  <div class="alert alert-success">{{ Session::get('message') }}</div>
-                   @endif
-                </center>
-                <ul>
-                    <li><a href="{{url('/')}}/admin/home/home"><i class="fa fa-home" aria-hidden="true"></i> Home</a>
-                    </li>
-                    <li class="active-bre"><a href="#"> Dashboard</a>
-                    </li>
-                    <li class="page-back"><a href="{{url('/')}}/admin/SiteSettings"><i class="fa fa-forward" aria-hidden="true"></i>Go To Site Settings</a>
-                    </li>
-                </ul>
+<!-- Breadcrumbs -->
+<div class="mb-6">
+    <nav class="flex" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2">
+            <li>
+                <a href="{{url('/')}}/admin/home" class="text-gray-400 hover:text-indigo-600 transition-colors">
+                    <i class="fa fa-home"></i> Home
+                </a>
+            </li>
+            <li>
+                <span class="text-gray-500 mx-2">/</span>
+            </li>
+            <li>
+                <span class="text-gray-900 font-medium">Dashboard</span>
+            </li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Statistics Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <!-- Products Card -->
+    <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-indigo-100 text-sm font-medium mb-1">Total Products</p>
+                <h3 class="text-3xl font-bold">{{ $productCount }}</h3>
+                <a href="{{url('/')}}/admin/products" class="text-indigo-100 hover:text-white text-sm mt-2 inline-flex items-center">
+                    View all <i class="fa fa-arrow-right ml-1"></i>
+                </a>
             </div>
-            <!--== DASHBOARD INFO ==-->
-            @include('admin.dashboard')
-            <!--== DASHBOARD INFO ==-->
-            <div class="sb2-2-3">
-                <div class="row">
+            <div class="bg-white/20 rounded-lg p-4">
+                <i class="fa fa-shopping-cart text-3xl"></i>
+            </div>
+        </div>
+    </div>
 
-                    <!--== Country Campaigns ==-->
-                    <div class="col-md-12">
-                        <div class="box-inn-sp">
-                            <div class="inn-title">
-                                <h4> Activity Logs</h4>
-                                <p>Registers All important activities by all users</p>
-                                <a class='dropdown-button drop-down-meta' href='#' data-activates='dropdown2'><i class="material-icons">more_vert</i></a>
-                                 <!-- Dropdown Structure -->
-                                 <ul id='dropdown1' class='dropdown-content'>
-                                    <li><a href="{{url('/')}}/admin/activitylogs">All Activity</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="tab-inn">
-                                <div class="table-responsive table-desi">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>User</th>
-                                                <th>Descriptions</th>
-                                                <th>Date</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($ActivityLog as $item)
-                                            <tr>
-                                                <td><span class="txt-dark weight-500">{{$item->id}}</span>
-                                                </td>
-                                                <td>
-                                                    <?php
-                                                       $UserName = DB::table('users')->where('id',$item->causer_id)->get();
+    <!-- Categories Card -->
+    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-purple-100 text-sm font-medium mb-1">Categories</p>
+                <h3 class="text-3xl font-bold">{{ $categoryCount }}</h3>
+                <a href="{{url('/')}}/admin/categories" class="text-purple-100 hover:text-white text-sm mt-2 inline-flex items-center">
+                    View all <i class="fa fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            <div class="bg-white/20 rounded-lg p-4">
+                <i class="fa fa-folder text-3xl"></i>
+            </div>
+        </div>
+    </div>
 
-                                                    ?> @foreach($UserName as $TheName) {{$TheName->name}} @endforeach
-                                                </td>
-                                                <td><span class="txt-success"><i class="fa fa-check" aria-hidden="true"></i>{{$item->description}}</span>
-                                                </td>
-                                                <td>
-                                                    <span style="font-weight: 600;" class="txt-dark weight-500">{{$item->created_at}}</span>
-                                                </td>
+    <!-- Services Card -->
+    <div class="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-pink-100 text-sm font-medium mb-1">Services</p>
+                <h3 class="text-3xl font-bold">{{ $serviceCount }}</h3>
+                <a href="{{url('/')}}/admin/services" class="text-pink-100 hover:text-white text-sm mt-2 inline-flex items-center">
+                    View all <i class="fa fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            <div class="bg-white/20 rounded-lg p-4">
+                <i class="fa fa-cogs text-3xl"></i>
+            </div>
+        </div>
+    </div>
 
-                                            </tr>
-                                            @endforeach
+    <!-- Blogs Card -->
+    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-200">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-blue-100 text-sm font-medium mb-1">Blog Posts</p>
+                <h3 class="text-3xl font-bold">{{ $blogCount }}</h3>
+                <a href="{{url('/')}}/admin/blog" class="text-blue-100 hover:text-white text-sm mt-2 inline-flex items-center">
+                    View all <i class="fa fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            <div class="bg-white/20 rounded-lg p-4">
+                <i class="fa fa-rss text-3xl"></i>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Secondary Stats -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white rounded-xl shadow-md p-5 border border-gray-200">
+        <div class="flex items-center">
+            <div class="bg-indigo-100 rounded-lg p-3 mr-4">
+                <i class="fa fa-tags text-indigo-600 text-xl"></i>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm">Brands</p>
+                <p class="text-2xl font-bold text-gray-900">{{ $brandCount }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-5 border border-gray-200">
+        <div class="flex items-center">
+            <div class="bg-green-100 rounded-lg p-3 mr-4">
+                <i class="fa fa-users text-green-600 text-xl"></i>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm">Users</p>
+                <p class="text-2xl font-bold text-gray-900">{{ $userCount }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-5 border border-gray-200">
+        <div class="flex items-center">
+            <div class="bg-yellow-100 rounded-lg p-3 mr-4">
+                <i class="fa fa-envelope text-yellow-600 text-xl"></i>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm">Messages</p>
+                <p class="text-2xl font-bold text-gray-900">{{ $messageCount }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-5 border border-gray-200">
+        <div class="flex items-center">
+            <div class="bg-red-100 rounded-lg p-3 mr-4">
+                <i class="fa fa-image text-red-600 text-xl"></i>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm">Sliders</p>
+                <p class="text-2xl font-bold text-gray-900">{{ $sliderCount }}</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Activity Logs -->
+    <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200">
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 border-b border-indigo-800">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Activity Logs</h3>
+                    <p class="text-indigo-100 text-sm mt-1">Recent system activities</p>
+                </div>
+                <a href="{{url('/')}}/admin/activitylogs" class="text-indigo-100 hover:text-white text-sm font-medium">
+                    View All <i class="fa fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+        <div class="p-6">
+            <div class="space-y-4 max-h-96 overflow-y-auto">
+                @forelse($ActivityLog as $item)
+                <div class="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="flex-shrink-0">
+                        <div class="bg-indigo-100 rounded-full p-2">
+                            <i class="fa fa-check-circle text-indigo-600 text-sm"></i>
                         </div>
                     </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-900 font-medium">
+                            @php
+                                $UserName = DB::table('users')->where('id', $item->causer_id)->first();
+                            @endphp
+                            {{ $UserName->name ?? 'System' }}
+                        </p>
+                        <p class="text-sm text-gray-600 mt-1">{{ $item->description }}</p>
+                        <p class="text-xs text-gray-400 mt-1">
+                            {{ \Carbon\Carbon::parse($item->created_at)->format('M d, Y H:i') }}
+                        </p>
+                    </div>
+                </div>
+                @empty
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fa fa-history text-4xl mb-2"></i>
+                    <p>No activity logs found</p>
+                </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
 
-                    <div class="col-md-12">
-                        <div class="box-inn-sp">
-                            <div class="inn-title">
-                                <h4> Notifications </h4>
-                                <p>All Site notifications</p>
-                                <a class='dropdown-button drop-down-meta' href='#' data-activates='dropdown1'><i class="material-icons">more_vert</i></a>
-                                <!-- Dropdown Structure -->
-                                <ul id='dropdown1' class='dropdown-content'>
-                                    <li><a href="#!">Add New</a>
-                                    </li>
-                                    <li><a href="#!">Edit</a>
-                                    </li>
-                                    <li><a href="#!">Update</a>
-                                    </li>
-                                    <li class="divider"></li>
-                                    <li><a href="#!"><i class="material-icons">delete</i>Delete</a>
-                                    </li>
-                                    <li><a href="#!"><i class="material-icons">subject</i>View All</a>
-                                    </li>
-                                    <li><a href="#!"><i class="material-icons">play_for_work</i>Download</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="tab-inn">
-                                <div class="table-responsive table-desi">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Country</th>
-                                                <th>Client</th>
-                                                <th>Changes</th>
-                                                <th>Budget</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><span class="txt-dark weight-500">Australia</span>
-                                                </td>
-                                                <td>Beavis</td>
-                                                <td><span class="txt-success"><i class="fa fa-angle-up" aria-hidden="true"></i><span>2.43%</span></span>
-                                                </td>
-                                                <td>
-                                                    <span class="txt-dark weight-500">$1478</span>
-                                                </td>
-                                                <td>
-                                                    <span class="label label-success">Active</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="txt-dark weight-500">Cuba</span>
-                                                </td>
-                                                <td>Felix</td>
-                                                <td><span class="txt-success"><i class="fa fa-angle-up" aria-hidden="true"></i><span>1.43%</span></span>
-                                                </td>
-                                                <td>
-                                                    <span class="txt-dark weight-500">$951</span>
-                                                </td>
-                                                <td>
-                                                    <span class="label label-danger">Closed</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="txt-dark weight-500">France</span>
-                                                </td>
-                                                <td>Cannibus</td>
-                                                <td><span class="txt-danger"><i class="fa fa-angle-up" aria-hidden="true"></i><span>-8.43%</span></span>
-                                                </td>
-                                                <td>
-                                                    <span class="txt-dark weight-500">$632</span>
-                                                </td>
-                                                <td>
-                                                    <span class="label label-default">Hold</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="txt-dark weight-500">Norway</span>
-                                                </td>
-                                                <td>Neosoft</td>
-                                                <td><span class="txt-success"><i class="fa fa-angle-up" aria-hidden="true"></i><span>7.43%</span></span>
-                                                </td>
-                                                <td>
-                                                    <span class="txt-dark weight-500">$325</span>
-                                                </td>
-                                                <td>
-                                                    <span class="label label-default">Hold</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="txt-dark weight-500">South Africa</span>
-                                                </td>
-                                                <td>Hencework</td>
-                                                <td><span class="txt-success"><i class="fa fa-angle-up" aria-hidden="true"></i><span>9.43%</span></span>
-                                                </td>
-                                                <td>
-                                                    <span>$258</span>
-                                                </td>
-                                                <td>
-                                                    <span class="label label-success">Active</span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+    <!-- Latest Messages -->
+    <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200">
+        <div class="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-4 border-b border-blue-800">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Latest Messages</h3>
+                    <p class="text-blue-100 text-sm mt-1">Recent enquiries & messages</p>
+                </div>
+                <a href="{{url('/')}}/admin/allMessages" class="text-blue-100 hover:text-white text-sm font-medium">
+                    View All <i class="fa fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+        <div class="p-6">
+            <div class="space-y-4 max-h-96 overflow-y-auto">
+                @forelse($Message as $item)
+                <div class="border-l-4 border-blue-500 pl-4 py-3 rounded-r-lg hover:bg-gray-50 transition-colors">
+                    <div class="flex items-start">
+                        <i class="fa fa-envelope text-blue-500 mr-3 mt-1"></i>
+                        <div class="flex-1">
+                            @php
+                                $RawDate = $item->created_at;
+                                $FormatDate = strtotime($RawDate);
+                                $Month = date('M', $FormatDate);
+                                $Date = date('D', $FormatDate);
+                                $date = date('d', $FormatDate);
+                                $Year = date('Y', $FormatDate);
+                            @endphp
+                            <h4 class="text-sm font-semibold text-gray-900">
+                                {{$item->subject}}
+                            </h4>
+                            <p class="text-sm text-gray-600 mt-1 line-clamp-2">{{$item->content}}</p>
+                            <p class="text-xs text-gray-400 mt-2">
+                                <i class="fa fa-clock-o mr-1"></i>{{$Date}}, {{$date}} {{$Month}}, {{$Year}}
+                            </p>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="sb2-2-3">
-                <!--== User Details ==-->
-                <?php  $Users = DB::table('users')->get() ?>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="box-inn-sp">
-                            <div class="inn-title">
-                                <h4>System Users</h4>
-                                <p>Registered Users</p>
-                                <a class="dropdown-button drop-down-meta" href="#" data-activates="dr-users"><i class="material-icons">more_vert</i></a>
-                                <ul id="dr-users" class="dropdown-content">
-                                    <li><a href="{{url('/')}}/admin/addUser">Add New User</a>
-                                    </li>
-
-                                    <li><a href="#!"><i class="material-icons">play_for_work</i>Download</a>
-                                    </li>
-                                </ul>
-                                <!-- Dropdown Structure -->
-
-                            </div>
-                            <div class="tab-inn">
-                                <div class="table-responsive table-desi">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>User</th>
-                                                <th>Name</th>
-                                                <th>Contacts</th>
-
-                                                <th>Country</th>
-                                                <th>Status</th>
-                                                <th>Delete</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-                                            @foreach ($Users as $item)
-                                            <tr>
-                                                <td><span class="list-img"><img src="{{url('/')}}/uploads/users/{{$item->image}}" alt="{{$item->name}}"></span>
-                                                </td>
-                                                <td><a href="{{url('/')}}/editUser/{{$item->id}}"><span class="list-enq-name">{{$item->name}}</span><span class="list-enq-city">@if($item->is_admin == 1) Administrator @else Normal User @endif</span></a>
-                                                </td>
-                                                <td>{{$item->mobile}}<br>{{$item->email}}<br>{{$item->address}}<br>{{$item->country}}</td>
-
-                                                <td>{{$item->country}}</td>
-                                                @if($item->status == 1)
-                                                <td>
-                                                    <span class="label label-success">Active</span>
-                                                    <br><hr>
-
-                                                    <a title="Switch To Inactive" href="{{url('/')}}/admin/switchStatus/{{$item->id}}" class="sb2-2-1-edit text-center"><i class="fa fa-exchange" aria-hidden="true"></i><span>Switch To Inactive</span></a>
-
-                                                </td>
-                                                @else
-                                                <td>
-                                                    <span class="label label-danger">Inactive</span><br><hr>
-
-                                                    <a title="Switch To Active" href="{{url('/')}}/admin/switchStatus/{{$item->id}}" class="sb2-2-1-edit text-center"><i class="fa fa-exchange" aria-hidden="true"></i><span>Switch To Active</span></a>
-
-                                                </td>
-                                                @endif
-
-
-                                                <td><a onclick="archiveFunction{{$item->id}}()" href="#" class="sb2-2-1-edit"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
-                                                </td>
-                                            </tr>
-                                            <script>
-                                                function archiveFunction{{$item->id}}()
-                                                    {
-                                                        event.preventDefault(); // prevent form submit
-                                                        swal({
-                                                            title: "Are you sure you want to delete this user?",
-                                                            text: "Once deleted, you will not be able to recover this data!",
-                                                            icon: "warning",
-                                                            buttons: true,
-                                                            dangerMode: true,
-                                                            })
-                                                            .then((willDelete) => {
-                                                            if (willDelete) {
-                                                                //do the ajax stuff.
-                                                                $.ajax({
-                                                                    url: "{{url('/')}}/admin/deleteUserAjax",
-                                                                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                                                                    type: "POST",
-                                                                    data: {id: {{$item->id}}},
-                                                                    dataType: "html",
-                                                                    success: function ()
-                                                                    {
-                                                                        swal("Done!","It was succesfully deleted!","success");
-                                                                        setTimeout(function() {
-                                                                            window.location.reload();
-                                                                        }, 3000);
-
-                                                                    }
-                                                                });
-                                                                //
-
-                                                            } else {
-                                                                swal("Your imaginary file is safe!");
-                                                            }
-                                                        });
-                                                    }
-                                            </script>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                @empty
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fa fa-envelope text-4xl mb-2"></i>
+                    <p>No messages available</p>
                 </div>
+                @endforelse
             </div>
+        </div>
+    </div>
+</div>
 
-
-
-            <!--== Latest Activity ==-->
-            <div class="sb2-2-3">
-                <div class="row">
-                    <!--== Latest Activity ==-->
-                    <div class="col-md-12">
-                        <div class="box-inn-sp">
-                            <div class="inn-title">
-                                <h4>Latest Messages</h4>
-                                <p>Latest Messages & Enquiries Goes Here</p>
-                            </div>
-                            <div class="tab-inn list-act-hom">
-                                <ul>
-                                    @foreach ($Message as $item)
-                                    <li class="list-act-hom-con">
-                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
-                                        <?php
-                                            $RawDate = $item->created_at;
-                                            $FormatDate = strtotime($RawDate);
-                                            $Month = date('M',$FormatDate);
-                                            $Date = date('D',$FormatDate);
-                                            $date = date('d',$FormatDate);
-                                            $Year = date('Y',$FormatDate);
-                                        ?>
-                                        <h4><span>{{$Date}}, {{$date}} {{$Month}}, {{$Year}}</span> {{$item->subject}}</h4>
-                                        <p>{{$item->content}}</p>
-                                    </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-            <!--== User Details ==-->
-            <div class="sb2-2-3">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="box-inn-sp">
-                            <div class="inn-title">
-                                <h4>Our Location On Google Map</h4>
-                            </div>
-                            @foreach ($SiteSettings as $Set)
-                            <div class="tab-inn">
-                                <div class="table-responsive table-desi tab-map">
-                                    <iframe src="{{$Set->map}}"  style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
+<!-- Notifications -->
+<div class="mb-6">
+    <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200">
+        <div class="bg-gradient-to-r from-yellow-500 to-orange-500 px-6 py-4 border-b border-yellow-800">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Notifications</h3>
+                    <p class="text-yellow-100 text-sm mt-1">System notifications</p>
                 </div>
             </div>
         </div>
-
+        <div class="p-6">
+            @forelse($Notifications as $item)
+            <div class="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors mb-3">
+                <div class="flex-shrink-0">
+                    <div class="bg-yellow-100 rounded-full p-2">
+                        <i class="fa fa-bell text-yellow-600 text-sm"></i>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm text-gray-900 font-medium">{{ $item->data ?? 'Notification' }}</p>
+                    <p class="text-xs text-gray-400 mt-1">
+                        {{ \Carbon\Carbon::parse($item->created_at ?? now())->format('M d, Y H:i') }}
+                    </p>
+                </div>
+            </div>
+            @empty
+            <div class="text-center py-8 text-gray-500">
+                <i class="fa fa-bell text-4xl mb-2"></i>
+                <p>No notifications available</p>
+            </div>
+            @endforelse
+        </div>
     </div>
 </div>
+
+<!-- Google Map Location -->
+@if(isset($SiteSettings) && !empty($SiteSettings->map))
+<div class="mb-6">
+    <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200">
+        <div class="bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4 border-b border-green-800">
+            <h3 class="text-lg font-semibold text-white">Our Location</h3>
+            <p class="text-green-100 text-sm mt-1">Find us on Google Maps</p>
+        </div>
+        <div class="p-6">
+            <div class="rounded-lg overflow-hidden border border-gray-200">
+                {!! $SiteSettings->map !!}
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 
 @endsection

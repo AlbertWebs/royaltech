@@ -10,9 +10,9 @@ return [
          * The default configurations to be used by the meta generator.
          */
         'defaults'       => [
-            'title'        => "It's Over 9000!", // set false to total remove
+            'title'        => false, // set false to total remove
             'titleBefore'  => false, // Put defaults.title before page title, like 'It's Over 9000! - Dashboard'
-            'description'  => 'For those who helped create the Genki Dama', // set false to total remove
+            'description'  => false, // set false to total remove
             'separator'    => ' - ',
             'keywords'     => [],
             'canonical'    => false, // Set to null or 'full' to use Url::full(), set to 'current' to use Url::current(), set false to total remove
@@ -22,13 +22,14 @@ return [
          * Webmaster tags are always added.
          */
         'webmaster_tags' => [
-            'google'    => null,
-            'bing'      => null,
-            'alexa'     => null,
-            'pinterest' => null,
-            'yandex'    => null,
-            'norton'    => null,
+            'google'    => 'RoyalTech Computers Limited – Laptops for Hire and Leasing in Kenya',
+            'bing'      => 'Laptops For Hire | RoyalTech Computers Limited - Laptops Rentals Etc',
+            'alexa'     => 'RoyalTech Computers – Laptop Rentals and Leasing Kenya',
+            'pinterest' => 'RoyalTech Computers Laptop Rentals & Leasing - Laptops Rentals Etc',
+            'yandex'    => 'RoyalTech Computers Limited | Laptops for Leasing Kenya - Laptops Rentals Etc',
+            'norton'    => 'RoyalTech Computers – Trusted Laptop Hire & Rental Services - Laptops Rentals Etc',
         ],
+
 
         'add_notranslate_class' => false,
     ],
@@ -37,8 +38,8 @@ return [
          * The default configurations to be used by the opengraph generator.
          */
         'defaults' => [
-            'title'       => 'Over 9000 Thousand!', // set false to total remove
-            'description' => 'For those who helped create the Genki Dama', // set false to total remove
+            'title'       => false, // set false to total remove
+            'description' => false, // set false to total remove
             'url'         => false, // Set null for using Url::current(), set false to total remove
             'type'        => false,
             'site_name'   => false,
@@ -59,8 +60,8 @@ return [
          * The default configurations to be used by the json-ld generator.
          */
         'defaults' => [
-            'title'       => 'Over 9000 Thousand!', // set false to total remove
-            'description' => 'For those who helped create the Genki Dama', // set false to total remove
+            'title'       => false, // set false to total remove
+            'description' => false, // set false to total remove
             'url'         => false, // Set to null or 'full' to use Url::full(), set to 'current' to use Url::current(), set false to total remove
             'type'        => 'WebPage',
             'images'      => [],

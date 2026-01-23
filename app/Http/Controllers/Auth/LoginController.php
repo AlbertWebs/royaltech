@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Hash;
@@ -23,19 +22,21 @@ class LoginController extends Controller
     |--------------------------------------------------------------------------
     |
     | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
+    | redirecting them to your home screen.
     |
     */
 
-    // use AuthenticatesUsers;
-    use AuthenticatesUsers {
-        logout as performLogout;
-    }
-
+    /**
+     * Log the user out of the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function logout(Request $request)
     {
-        $this->performLogout($request);
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         Session::flash('message', "You have successfully logged out");
         return redirect()->route('home');
     }
@@ -56,6 +57,16 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    /**
+     * Show the application's login form.
+     *
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
+     */
+    public function showLoginForm()
+    {
+        return view('auth.login');
     }
 
     public function login(Request $request)

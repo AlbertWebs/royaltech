@@ -96,7 +96,7 @@ class AdminsController extends Controller
 
         $Notifications = DB::table('notifications')->limit('5')->get();
         $ActivityLog = DB::table('activity_log')->orderBy('id','DESC')->limit('5')->get();
-        $SiteSettings = DB::table('_site_settings')->get();
+        $SiteSettings = DB::table('_site_settings')->first();
         $Message = DB::table('messages')->limit('5')->get();
         return view('admin.index',compact('Notifications','ActivityLog','SiteSettings','Message'));
     }
@@ -106,7 +106,7 @@ class AdminsController extends Controller
         activity()->log('User Accessed the Admins Dashboard');
         $Notifications = DB::table('notifications')->limit('5')->get();
         $ActivityLog = DB::table('activity_log')->orderBy('id','DESC')->paginate(100);
-        $SiteSettings = DB::table('_site_settings')->get();
+        $SiteSettings = DB::table('_site_settings')->first();
         $Message = DB::table('messages')->limit('5')->get();
         return view('admin.index',compact('Notifications','ActivityLog','SiteSettings','Message'));
     }
@@ -115,7 +115,7 @@ class AdminsController extends Controller
 
     public function SiteSettings(){
         activity()->log('User Accessed Site Settings Page');
-        $SiteSettings = DB::table('_site_settings')->get();
+        $SiteSettings = DB::table('_site_settings')->first();
         return view('admin.site_settings',compact('SiteSettings'));
     }
 
@@ -140,7 +140,7 @@ class AdminsController extends Controller
 
     public function logo_and_favicon(){
         activity()->log('User Accessed Logo & Favicon Settings Page');
-        $SiteSettings = DB::table('_site_settings')->get();
+        $SiteSettings = DB::table('_site_settings')->first();
         return view('admin.logo_and_favicon',compact('SiteSettings'));
     }
 
@@ -434,7 +434,7 @@ class AdminsController extends Controller
 
     public function deleteSlider($id){
         activity()->log(' Deleted Slider Number '.$id.'');
-        DB::table('slider')->where('id',$id)->delete();
+        DB::table('sliders')->where('id',$id)->delete();
         return Redirect::back();
     }
 
@@ -818,8 +818,35 @@ class AdminsController extends Controller
         return view('admin.services',compact('page_title','Service','page_name'));
     }
 
+    public function addservice(){
+        activity()->log('Accessed Add Service Page');
+        $page_title = 'formfiletext';
+        $page_name = 'Add Service';
+        return view('admin.addservice',compact('page_title','page_name'));
+    }
 
+    public function add_service(Request $request){
+        activity()->log('Evoked add Service Operation');
+        $path = 'uploads/services';
+        if(isset($request->image_one)){
+            $file = $request->file('image_one');
+            $filename = $file->getClientOriginalName();
+            $file->move($path, $filename);
+            $image_one = $filename;
+        }else{
+            $image_one = "0";
+        }
 
+        $Service = new Service;
+        $Service->title = $request->title;
+        $Service->slung = Str::slug($request->title);
+        $Service->content = $request->meta;
+        $Service->content_one = $request->content;
+        $Service->image = $image_one;
+        $Service->save();
+        Session::flash('message', "Service Has Been Added");
+        return Redirect::back();
+    }
 
     public function editServices($id){
         $Category = Category::all();
@@ -874,7 +901,7 @@ class AdminsController extends Controller
 
     public function users(){
         activity()->log('Access All users Page');
-        $Users = DB::table('users')->where('is_admin','0')->get();
+        $Users = DB::table('users')->orderBy('created_at', 'DESC')->get();
         $page_title = 'list';
         $page_name = 'Users';
         return view('admin.users',compact('page_title','Users','page_name'));
@@ -2148,7 +2175,7 @@ class AdminsController extends Controller
             'google'=>$request->google,
         );
 
-        DB::table('site_settings')->update($updateDetails);
+        DB::table('_site_settings')->update($updateDetails);
         Session::flash('message', "Changes have Been Saved");
         return Redirect::back();
     }

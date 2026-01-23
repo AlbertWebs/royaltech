@@ -1,291 +1,292 @@
 @extends('admin.master')
+
 @section('content')
-<!-- Remember to include jQuery :) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+<!-- Breadcrumbs -->
+<div class="mb-6">
+    <nav class="flex" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2">
+            <li>
+                <a href="{{url('/')}}/admin/home" class="text-gray-400 hover:text-indigo-600 transition-colors">
+                    <i class="fa fa-home"></i> Home
+                </a>
+            </li>
+            <li>
+                <span class="text-gray-500 mx-2">/</span>
+            </li>
+            <li>
+                <a href="{{url('/')}}/admin/products" class="text-gray-400 hover:text-indigo-600">Products</a>
+            </li>
+            <li>
+                <span class="text-gray-500 mx-2">/</span>
+            </li>
+            <li>
+                <span class="text-gray-900 font-medium">Edit {{ $Product->name }}</span>
+            </li>
+        </ol>
+    </nav>
+</div>
 
-<!-- jQuery Modal -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
-<style>
-    .modal a.close-modal{
-        top:0px !important;
-        right:0px !important;
-    }
-</style>
-<!--== BODY CONTNAINER ==-->
- <div class="container-fluid sb2">
-    <div class="row">
-        @include('admin.sidebar')
-
-        <!--== BODY INNER CONTAINER ==-->
-
-        <div class="sb2-2">
-            <div class="sb2-2-2">
-                <ul>
-                    <li><a href="{{url('/')}}"><i class="fa fa-home" aria-hidden="true"></i> Home</a>
-                    </li>
-                    <li class="active-bre"><a href="#"> Edit {{$Product->name}}</a>
-                    </li>
-                    <li class="page-back"><a href="{{url('/')}}/admin/products"><i class="fa fa-backward" aria-hidden="true"></i> All Products</a>
-                    </li>
-                </ul>
-
+<!-- Form Card -->
+<div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200">
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 border-b border-indigo-800">
+        <div>
+            <h3 class="text-lg font-semibold text-white">Edit Product: {{ $Product->name }}</h3>
+            <p class="text-indigo-100 text-sm mt-1">Update product information</p>
+        </div>
+    </div>
+    
+    <form method="POST" action="{{url('/')}}/admin/edit_Product/{{$Product->id}}" enctype="multipart/form-data" class="px-6 py-6">
+        @csrf
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Product Name -->
+            <div class="md:col-span-2">
+                <x-admin.form.input 
+                    name="title" 
+                    label="Product Name" 
+                    :value="$Product->name"
+                    placeholder="Enter product name"
+                    required
+                />
             </div>
-            <div class="sb2-2-add-blog sb2-2-1">
-                <div class="box-inn-sp">
-                    <div class="inn-title">
-                        <h4>Edit {{$Product->name}}</h4>
-                        <center>
-                            @if(Session::has('message'))
-                                          <div class="alert alert-success">{{ Session::get('message') }}</div>
-                           @endif
 
-                           @if(Session::has('messageError'))
-                                          <div class="alert alert-danger">{{ Session::get('messageError') }}</div>
-                           @endif
-                        </center>
+            <!-- Product Price -->
+            <x-admin.form.input 
+                name="price" 
+                label="Product Price" 
+                type="number"
+                :value="$Product->price"
+                placeholder="0.00"
+                required
+            />
+
+            <!-- SKU -->
+            <x-admin.form.input 
+                name="sku" 
+                label="SKU" 
+                :value="$Product->sku"
+                placeholder="SKU-01"
+                required
+                readonly
+            />
+
+            <!-- Category -->
+            <div>
+                @php
+                    $CategorySelected = DB::table('categories')->where('id', $Product->category)->first();
+                    $categoryOptions = [];
+                    foreach($Category as $cat) {
+                        $categoryOptions[$cat->id] = $cat->title;
+                    }
+                @endphp
+                <x-admin.form.select 
+                    name="category" 
+                    label="Choose Category" 
+                    :options="$categoryOptions"
+                    :value="$Product->category"
+                    placeholder="Select a category"
+                    required
+                />
+            </div>
+
+            <!-- Brand -->
+            <div>
+                @php
+                    $Brand = DB::table('brands')->get();
+                    $brandOptions = [];
+                    foreach($Brand as $brand) {
+                        $brandOptions[$brand->title] = $brand->title;
+                    }
+                @endphp
+                <x-admin.form.select 
+                    name="brand" 
+                    label="Choose Brand" 
+                    :options="$brandOptions"
+                    :value="$Product->brand"
+                    placeholder="Select a brand"
+                    required
+                />
+            </div>
+
+            <!-- Product Condition -->
+            <x-admin.form.select 
+                name="condition" 
+                label="Product Condition" 
+                :options="['Ex-UK' => 'Ex-UK', 'New' => 'New']"
+                :value="$Product->pro_condition"
+                placeholder="Select condition"
+                required
+            />
+
+            <!-- Stock Status -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="text-sm font-medium text-gray-900 mb-3">Stock Status</h4>
+                <x-admin.form.toggle 
+                    name="stock" 
+                    label="In Stock"
+                    :value="$Product->stock == 'In Stock'"
+                />
+            </div>
+        </div>
+
+        <!-- Meta Description -->
+        <div class="mt-6">
+            <x-admin.form.textarea 
+                name="meta" 
+                label="Meta Description" 
+                :value="$Product->meta"
+                rows="3"
+                placeholder="Enter meta description for SEO"
+                required
+            />
+        </div>
+
+        <!-- Content (CKEditor) -->
+        <div class="mt-6">
+            <label for="article-ckeditor" class="block text-sm font-medium text-gray-700 mb-2">
+                Product Description <span class="text-red-500">*</span>
+            </label>
+            <textarea 
+                id="article-ckeditor" 
+                name="content" 
+                class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 sm:text-sm bg-white px-4 py-3.5 transition-colors min-h-[300px]"
+                rows="12"
+                required
+            >{{ $Product->content }}</textarea>
+            <script>
+                if (typeof CKEDITOR !== 'undefined') {
+                    CKEDITOR.replace('article-ckeditor', {
+                        height: 400,
+                        toolbar: [
+                            { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike'] },
+                            { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Blockquote'] },
+                            { name: 'links', items: ['Link', 'Unlink'] },
+                            { name: 'insert', items: ['Image', 'Table'] },
+                            { name: 'styles', items: ['Format', 'Font', 'FontSize'] },
+                            { name: 'colors', items: ['TextColor', 'BGColor'] },
+                            { name: 'tools', items: ['Maximize', 'Source'] }
+                        ]
+                    });
+                }
+            </script>
+        </div>
+
+        <!-- Product Images -->
+        <div class="mt-6">
+            <h4 class="text-sm font-medium text-gray-900 mb-4">Product Images (600px x 600px recommended)</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Image One -->
+                <div x-data="{ preview: '{{url('/')}}/uploads/products/{{$Product->image_one}}', fileName: '' }">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Image One</label>
+                    <div class="mt-1 flex items-center mb-3">
+                        <label for="image_one" class="cursor-pointer">
+                            <span class="inline-flex items-center px-4 py-2 border-2 border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                <i class="fa fa-upload mr-2"></i> Choose File
+                            </span>
+                            <input 
+                                type="file"
+                                name="image_one"
+                                id="image_one"
+                                accept="image/*"
+                                class="sr-only"
+                                @change="fileName = $event.target.files[0]?.name || ''; if ($event.target.files[0]) { const reader = new FileReader(); reader.onload = (e) => preview = e.target.result; reader.readAsDataURL($event.target.files[0]); }"
+                            >
+                        </label>
+                        <span x-show="fileName" class="ml-3 text-sm text-gray-600 font-medium" x-text="fileName"></span>
                     </div>
-                    <div class="bor">
-                        <form method="POST" action="{{url('/')}}/admin/edit_Product/{{$Product->id}}" enctype="multipart/form-data">
-                            {{csrf_field()}}
-                            <div class="row">
-                                <div class="input-field col s12">
-                                    <input autocomplete="off" name="title" id="list-title" value="{{$Product->name}}" type="text" class="validate" required>
-                                    <label for="list-title">Product Name</label>
-                                </div>
-                                <div class="input-field col s12">
-                                    <input autocomplete="off" name="price" id="list-title" value="{{$Product->price}}" type="number" class="validate" required>
-                                    <label for="list-title">Product Price</label>
-                                </div>
-                                <div class="input-field col s12">
-                                    <input autocomplete="off" name="sku" id="list-title" value="{{$Product->sku}}" type="text" placeholder="SKU-01" class="validate" readonly required>
-                                    <label for="list-title">SKU</label>
-                                </div>
-
-
-                            </div>
-                            <div class="row">
-
-                                {{--  --}}
-                                <div class="input-field col s12">
-                                    <select required name="category" class="icons" id="mydiv">
-                                        <?php $CategorySelected = DB::table('categories')->where('id',$Product->category)->get() ?>
-                                        @foreach ($CategorySelected as $CatSel)
-                                        <option value="{{$CatSel->id}}" selected>{{$CatSel->title}}</option>
-                                        @endforeach
-                                        @foreach ($Category as $Categories)
-                                        <option value="{{$Categories->id}}" data-icon="{{url('/')}}/uploads/categories/{{$Categories->image}}" class="circle">{{$Categories->title}}</option>
-                                        @endforeach
-                                    </select>
-                                    <label>Choose Category</label>
-                                </div>
-
-                                <div class="section-space col s12"></div>
-                            </div>
-
-                            <div class="row">
-
-                                {{--  --}}
-                                <div class="input-field col s12">
-                                    <select required name="brand" class="icons" id="mydiv">
-                                        <?php $CategoryBrand = DB::table('brands')->where('title',$Product->brand)->get() ?>
-                                        @foreach ($CategoryBrand as $CatSel)
-                                        <option value="{{$CatSel->title}}" selected>{{$CatSel->title}}</option>
-                                        @endforeach
-                                        <?php $Brand = DB::table('brands')->get(); ?>
-                                        @foreach ($Brand as $brands)
-                                        <option value="{{$brands->title}}" data-icon="{{url('/')}}/uploads/brands/{{$brands->image}}" class="circle">{{$brands->title}}</option>
-                                        @endforeach
-                                    </select>
-                                    <label>Choose Category</label>
-                                </div>
-
-                                <div class="section-space col s12"></div>
-                            </div>
-
-                            {{--  --}}
-                            <div class="row">
-
-                                {{--  --}}
-                                <div class="input-field col s12">
-                                    <select required name="condition" class="icons" id="mydiv">
-                                        <option value="{{$Product->pro_condition}}" selected>{{$Product->pro_condition}}</option>
-
-                                        <option value="Ex-UK"  class="circle">Ex-UK</option>
-                                        <option value="New"  class="circle">New</option>
-
-                                    </select>
-                                    <label>Product Condition</label>
-                                </div>
-
-                                {{--  --}}
-                                <div class="section-space col s12"></div>
-                            </div>
-                            {{--  --}}
-                            {{-- Stock --}}
-                            <div class="input-field col s6">
-                                <div class="box-inn-sp box-second-inn">
-                                    <div class="inn-title">
-                                        <h4>Stock Status</h4>
-                                    </div>
-                                    <div class="tab-inn">
-                                        @if($Product->stock == 'Out Of Stock')
-                                        <!-- Switch -->
-                                        <div class="switch mar-bot-20">
-                                            <label>
-                                                Off
-                                                <input name="stock" type="checkbox">
-                                                <span class="lever"></span> On
-                                            </label>
-                                        </div>
-                                        @else
-                                        <!-- Switch -->
-                                        <div class="switch mar-bot-20">
-                                            <label>
-                                                Off
-                                                <input name="stock" checked type="checkbox">
-                                                <span class="lever"></span> On
-                                            </label>
-                                        </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="input-field col s12">
-                                    <textarea required name="meta" class="materialize-textarea">{{$Product->meta}}</textarea>
-                                    <label for="textarea1">Meta Descriptions:</label>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="input-field col s12">
-                                    <textarea required id="article-ckeditor" name="content" class="materialilze-textarea" placeholder="content">{{$Product->content}}</textarea>
-                                </div>
-                            </div><br><br>
-
-                            <script src="{{ asset('ckeditor/ckeditor.js')}}"></script>
-                            <script>CKEDITOR.replace('article-ckeditor');</script>
-
-
-
-
-                           {{-- Images --}}
-                            <style>
-                                .btn-file {
-                                    position: relative;
-                                    overflow: hidden;
-                                }
-                                .btn-file input[type=file] {
-                                    position: absolute;
-                                    top: 0;
-                                    right: 0;
-                                    min-width: 33.33%;
-                                    min-height: 100%;
-                                    font-size: 100px;
-                                    text-align: right;
-                                    filter: alpha(opacity=0);
-                                    opacity: 0;
-                                    outline: none;
-                                    background: white;
-                                    cursor: inherit;
-                                    display: block;
-                                }
-
-                                #img-upload{
-                                    width: 33.33%;
-                                }
-                                .image-preview{
-                                    max-height:100%;
-                                    height:100% !important;
-                                }
-                            </style>
-                            {{-- Style --}}
-                            <div class="row">
-                                <div class="">
-                                    <div class="input-field col s3 col-lg-3">
-                                        <div class="form-group">
-                                            <label>Image One</label>
-                                            <div class="input-group">
-                                                <span class="input-group-btn">
-                                                    <span class="btn btn-default btn-file">
-                                                       <small> One: Size 600 by 600  Browse… </small><input name="image_one" type="file" id="imgInp">
-                                                    </span>
-                                                </span>
-                                                <input type="text" class="form-control" readonly>
-                                            </div>
-                                            <img class="image-preview" style="width:100%" src="{{url('/')}}/uploads/products/{{$Product->image_one}}"/>
-                                        </div>
-                                    </div>
-
-                                    <div class="input-field col s3 col-lg-3">
-                                        <div class="form-group">
-                                            <label>Image Two</label>
-                                            <div class="input-group">
-                                                <span class="input-group-btn">
-                                                    <span class="btn btn-default btn-file">
-                                                        <small>Two: Size 600 by 600 Browse… </small>
-                                                        <input name="image_two" type="file" id="imgInp">
-                                                    </span>
-                                                </span>
-                                                <input type="text" class="form-control" readonly>
-                                            </div>
-                                            <img class="image-preview" style="width:100%" src="{{url('/')}}/uploads/products/{{$Product->image_two}}"/>
-                                        </div>
-                                    </div>
-
-                                    <div class="input-field col s3 col-lg-3">
-                                        <div class="form-group">
-                                            <label>Image Three</label>
-                                            <div class="input-group">
-                                                <span class="input-group-btn">
-                                                    <span class="btn btn-default btn-file">
-                                                        <small> Three: Size 600 by 600  Browse… </small><input name="image_three" type="file" id="imgInp">
-                                                    </span>
-                                                </span>
-                                                <input type="text" class="form-control" readonly>
-                                            </div>
-                                            <img class="image-preview img-upload" style="width:100%" src="{{url('/')}}/uploads/products/{{$Product->image_three}}"/>
-                                        </div>
-                                    </div>
-
-                                    <div class="input-field col s3 col-lg-3">
-                                        <div class="form-group">
-                                            <label>Image Four</label>
-                                            <div class="input-group">
-                                                <span class="input-group-btn">
-                                                    <span class="btn btn-default btn-file">
-                                                        <small> Four: Size 600 by 600  Browse… </small><input name="image_four" type="file" id="imgInp">
-                                                    </span>
-                                                </span>
-                                                <input type="text" class="form-control" readonly>
-                                            </div>
-                                            <img class="image-preview img-upload" style="width:100%" src="{{url('/')}}/uploads/products/{{$Product->image_four}}"/>
-                                        </div>
-                                    </div>
-
-
-                                </div>
-                            </div>
-
-                            <input type="hidden" name="image_one_cheat" value="{{$Product->image_one}}">
-                            <input type="hidden" name="image_two_cheat" value="{{$Product->image_two}}">
-                            <input type="hidden" name="image_three_cheat" value="{{$Product->image_three}}">
-                            <input type="hidden" name="image_four_cheat" value="{{$Product->image_four}}">
-
-                            <div class="row">
-                                <div class="input-field col s12">
-                                    <input  type="submit" class="waves-effect waves-light btn-large" value="Save Changes">
-                                </div>
-                            </div>
-                        </form>
+                    <div class="mt-4 bg-gray-200 rounded-lg border-2 border-gray-200 p-4 flex items-center justify-center h-32 overflow-hidden">
+                        <img :src="preview" alt="Preview" class="max-h-full max-w-full w-auto h-auto object-contain">
                     </div>
+                    <input type="hidden" name="image_one_cheat" value="{{$Product->image_one}}">
+                </div>
+
+                <!-- Image Two -->
+                <div x-data="{ preview: '{{url('/')}}/uploads/products/{{$Product->image_two}}', fileName: '' }">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Image Two</label>
+                    <div class="mt-1 flex items-center mb-3">
+                        <label for="image_two" class="cursor-pointer">
+                            <span class="inline-flex items-center px-4 py-2 border-2 border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                <i class="fa fa-upload mr-2"></i> Choose File
+                            </span>
+                            <input 
+                                type="file"
+                                name="image_two"
+                                id="image_two"
+                                accept="image/*"
+                                class="sr-only"
+                                @change="fileName = $event.target.files[0]?.name || ''; if ($event.target.files[0]) { const reader = new FileReader(); reader.onload = (e) => preview = e.target.result; reader.readAsDataURL($event.target.files[0]); }"
+                            >
+                        </label>
+                        <span x-show="fileName" class="ml-3 text-sm text-gray-600 font-medium" x-text="fileName"></span>
+                    </div>
+                    <div class="mt-4 bg-gray-200 rounded-lg border-2 border-gray-200 p-4 flex items-center justify-center h-32 overflow-hidden">
+                        <img :src="preview" alt="Preview" class="max-h-full max-w-full w-auto h-auto object-contain">
+                    </div>
+                    <input type="hidden" name="image_two_cheat" value="{{$Product->image_two}}">
+                </div>
+
+                <!-- Image Three -->
+                <div x-data="{ preview: '{{url('/')}}/uploads/products/{{$Product->image_three}}', fileName: '' }">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Image Three</label>
+                    <div class="mt-1 flex items-center mb-3">
+                        <label for="image_three" class="cursor-pointer">
+                            <span class="inline-flex items-center px-4 py-2 border-2 border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                <i class="fa fa-upload mr-2"></i> Choose File
+                            </span>
+                            <input 
+                                type="file"
+                                name="image_three"
+                                id="image_three"
+                                accept="image/*"
+                                class="sr-only"
+                                @change="fileName = $event.target.files[0]?.name || ''; if ($event.target.files[0]) { const reader = new FileReader(); reader.onload = (e) => preview = e.target.result; reader.readAsDataURL($event.target.files[0]); }"
+                            >
+                        </label>
+                        <span x-show="fileName" class="ml-3 text-sm text-gray-600 font-medium" x-text="fileName"></span>
+                    </div>
+                    <div class="mt-4 bg-gray-200 rounded-lg border-2 border-gray-200 p-4 flex items-center justify-center h-32 overflow-hidden">
+                        <img :src="preview" alt="Preview" class="max-h-full max-w-full w-auto h-auto object-contain">
+                    </div>
+                    <input type="hidden" name="image_three_cheat" value="{{$Product->image_three}}">
+                </div>
+
+                <!-- Image Four -->
+                <div x-data="{ preview: '{{url('/')}}/uploads/products/{{$Product->image_four}}', fileName: '' }">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Image Four</label>
+                    <div class="mt-1 flex items-center mb-3">
+                        <label for="image_four" class="cursor-pointer">
+                            <span class="inline-flex items-center px-4 py-2 border-2 border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                <i class="fa fa-upload mr-2"></i> Choose File
+                            </span>
+                            <input 
+                                type="file"
+                                name="image_four"
+                                id="image_four"
+                                accept="image/*"
+                                class="sr-only"
+                                @change="fileName = $event.target.files[0]?.name || ''; if ($event.target.files[0]) { const reader = new FileReader(); reader.onload = (e) => preview = e.target.result; reader.readAsDataURL($event.target.files[0]); }"
+                            >
+                        </label>
+                        <span x-show="fileName" class="ml-3 text-sm text-gray-600 font-medium" x-text="fileName"></span>
+                    </div>
+                    <div class="mt-4 bg-gray-200 rounded-lg border-2 border-gray-200 p-4 flex items-center justify-center h-32 overflow-hidden">
+                        <img :src="preview" alt="Preview" class="max-h-full max-w-full w-auto h-auto object-contain">
+                    </div>
+                    <input type="hidden" name="image_four_cheat" value="{{$Product->image_four}}">
                 </div>
             </div>
         </div>
-        <!--== BODY INNER CONTAINER ==-->
 
-    </div>
+        <!-- Submit Button -->
+        <div class="mt-8 flex justify-end space-x-3 border-t border-gray-200 pt-6">
+            <a href="{{url('/')}}/admin/products" class="px-6 py-2.5 border-2 border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all">
+                <i class="fa fa-times mr-2"></i> Cancel
+            </a>
+            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-semibold hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md hover:shadow-lg transition-all">
+                <i class="fa fa-save mr-2"></i> Save Changes
+            </button>
+        </div>
+    </form>
 </div>
 
 @endsection

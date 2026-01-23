@@ -1,194 +1,186 @@
 @extends('admin.master')
+
 @section('content')
-<!-- Remember to include jQuery :) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
-
-<!-- jQuery Modal -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
-<style>
-    .modal a.close-modal{
-        top:0px !important;
-        right:0px !important;
-    }
-</style>
-<!--== BODY CONTNAINER ==-->
- <div class="container-fluid sb2">
-    <div class="row">
-        @include('admin.sidebar')
-
-        <!--== BODY INNER CONTAINER ==-->
-        <div class="sb2-2">
-            <div class="sb2-2-2">
-                <ul>
-                    <li><a href="#"><i class="fa fa-home" aria-hidden="true"></i> Home</a>
-                    </li>
-                    <li class="active-bre"><a href="#"> Privacy Policy</a>
-                    </li>
-                    <li class="page-back"><a href="{{url('/')}}/admin/addPrivacy"><i class="fa fa-pencil" aria-hidden="true"></i> Add Privacy</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="sb2-2-1">
-                <h2>All Privacy</h2>
-                <center>
-                    @if(Session::has('message'))
-                                  <div class="alert alert-success">{{ Session::get('message') }}</div>
-                   @endif
-   
-                   @if(Session::has('messageError'))
-                                  <div class="alert alert-danger">{{ Session::get('messageError') }}</div>
-                   @endif
-                </center>
-               
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Title</th>
-                            
-                            <th>Date</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-                        @foreach ($Privacy as $item)
-                        <tr>
-                            <td>{{$item->id}}</td>
-                            <td>{{$item->title}}</td>
-                   
-                            <td>
-                                <?php 
-                                    $RawDate = $item->created_at;
-                                    $FormatDate = strtotime($RawDate);
-                                    $Month = date('M',$FormatDate);
-                                    $Date = date('D',$FormatDate);
-                                    $date = date('d',$FormatDate);
-                                    $Year = date('Y',$FormatDate);
-                                ?>
-                                {{$Date}}, {{$date}} {{$Month}}, {{$Year}}
-                            </td>
-                            <td><a href="{{url('/')}}/admin/editPrivacy/{{$item->id}}" class="sb2-2-1-edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                            </td>
-                            <td><a onclick="archiveFunction{{$item->id}}()" href="#" class="sb2-2-1-edit"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
-                            </td>
-                        </tr>
-                        <script>
-                            function archiveFunction{{$item->id}}()
-                                {
-                                    event.preventDefault(); // prevent form submit
-                                    swal({
-                                        title: "Are you sure?",
-                                        text: "Once deleted, you will not be able to recover this imaginary file!",
-                                        icon: "warning",
-                                        buttons: true,
-                                        dangerMode: true,
-                                        })
-                                        .then((willDelete) => {
-                                        if (willDelete) {
-                                            //do the ajax stuff.
-                                            $.ajax({
-                                                url: "{{url('/')}}/admin/deletePrivacyAjax",
-                                                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                                                type: "POST",
-                                                data: {id: {{$item->id}}},
-                                                dataType: "html",
-                                                success: function () 
-                                                {
-                                                    swal("Done!","It was succesfully deleted!","success");
-                                                    setTimeout(function() {
-                                                        window.location.reload();
-                                                    }, 3000);
-
-                                                }
-                                            });
-                                            // 
-                                          
-                                        } else {
-                                            swal("Your imaginary file is safe!");
-                                        }
-                                    });
-                                }
-                        </script>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <!--== BODY INNER CONTAINER ==-->
-
-    </div>
+<!-- Breadcrumbs -->
+<div class="mb-6">
+    <nav class="flex" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2">
+            <li>
+                <a href="{{url('/')}}/admin/home" class="text-gray-400 hover:text-indigo-600 transition-colors">
+                    <i class="fa fa-home"></i> Home
+                </a>
+            </li>
+            <li>
+                <span class="text-gray-500 mx-2">/</span>
+            </li>
+            <li>
+                <a href="{{url('/')}}/admin/SiteSettings" class="text-gray-400 hover:text-indigo-600">Site Settings</a>
+            </li>
+            <li>
+                <span class="text-gray-500 mx-2">/</span>
+            </li>
+            <li>
+                <span class="text-gray-900 font-medium">Privacy Policies</span>
+            </li>
+        </ol>
+    </nav>
 </div>
 
-{{--  --}}
-<div id="ex1" class="modal">
-    <div class="sb2-2-3">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="box-inn-sp">
-                    <div class="inn-title">
-                        <h4>Add New Category</h4>
+<!-- Page Header -->
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900">Privacy Policies</h2>
+        <p class="text-gray-600 mt-1">Manage your privacy policy pages</p>
+    </div>
+    <a href="{{url('/')}}/admin/addPrivacy" 
+       class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-semibold hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md hover:shadow-lg transition-all">
+        <i class="fa fa-plus mr-2"></i> Add New Policy
+    </a>
+</div>
+
+<!-- Privacy Policies List -->
+<div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200">
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 border-b border-indigo-800">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-lg font-semibold text-white">All Privacy Policies</h3>
+                <p class="text-indigo-100 text-sm mt-1">{{ count($Privacy) }} policy(s) total</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="p-6">
+        @forelse($Privacy as $item)
+        <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 shadow-md hover:shadow-xl transition-all duration-300 mb-4 group overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center mb-3">
+                            <div class="bg-indigo-100 rounded-lg p-2 mr-3">
+                                <i class="fa fa-shield text-indigo-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                                    {{ $item->title }}
+                                </h3>
+                                <div class="flex items-center mt-1 space-x-4 text-sm text-gray-500">
+                                    <span class="flex items-center">
+                                        <i class="fa fa-calendar mr-1.5"></i>
+                                        @php 
+                                            $RawDate = $item->created_at;
+                                            $FormatDate = strtotime($RawDate);
+                                            $Month = date('M', $FormatDate);
+                                            $Date = date('D', $FormatDate);
+                                            $date = date('d', $FormatDate);
+                                            $Year = date('Y', $FormatDate);
+                                        @endphp
+                                        {{ $Date }}, {{ $date }} {{ $Month }}, {{ $Year }}
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i class="fa fa-hashtag mr-1.5"></i>
+                                        ID: {{ $item->id }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        @if($item->content)
+                        <div class="mt-4 pl-14">
+                            <p class="text-gray-600 text-sm line-clamp-2">
+                                {{ strip_tags(Str::limit($item->content, 150)) }}
+                            </p>
+                        </div>
+                        @endif
                     </div>
-                    <div class="tab-inn">
-                        <form method="POST" id="categoryAddForm">
-                            {{csrf_field()}}
-                            <div class="row">
-                                <div class="input-field col s12">
-                                    <input autocomplete="off" name="title" id="CategoryTitle" type="text" class="validate">
-                                    <label for="CategoryName">Category Name</label>
-                                </div>
-                            </div>
-                            <div class="row" id="submitButton">
-                                <div class="input-field col s12">
-                                    <input  type="submit" class="waves-effect waves-light btn-large" value="Submit">
-                                </div>
-                            </div>
-                            
-                            <div class="tab-inn" id="loading-bar">
-                                <div class="progress">
-                                    <div class="indeterminate"></div>
-                                </div>
-                            </div>
-                            
-                        </form>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex items-center space-x-2 ml-4">
+                        <a href="{{url('/')}}/admin/editPrivacy/{{$item->id}}" 
+                           class="inline-flex items-center px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg text-sm font-semibold hover:bg-indigo-100 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
+                           title="Edit Policy">
+                            <i class="fa fa-pencil mr-2"></i> Edit
+                        </a>
+                        <button onclick="deletePrivacy({{$item->id}})" 
+                                class="inline-flex items-center px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-100 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all"
+                                title="Delete Policy">
+                            <i class="fa fa-trash mr-2"></i> Delete
+                        </button>
                     </div>
                 </div>
             </div>
-{{-- <a href="#" rel="modal:close">Close</a> --}}
-<script type="text/javascript">
-        // A $( document ).ready() block.
-    $( document ).ready(function() {
-        $('#loading-bar').hide();
-    });
-
-    $('#categoryAddForm').on('submit',function(event){
-        event.preventDefault();
-        $('#loading-bar').show();
-   
-
-        let title = $('#CategoryTitle').val();
-       
-
-        $.ajax({
-          url: "{{url('/')}}/admin/addCategoryAjaxRequest",
-          type:"POST",
-          data:{
-            "_token": "{{ csrf_token() }}",
-            title:title,
-          },
-          success:function(response){
-            $('#loading-bar').hide();
-            $('#submitButton').html('<center><span class="alert-success text-center">Category Added Successfully</span></center>').delay(3000);
-            $('#categoryAddForm')[0].reset();
-            setTimeout(function() {
-                location.reload();
-            }, 5000);
-          },
-         });
-        });
-      </script>
+        </div>
+        @empty
+        <div class="text-center py-12">
+            <div class="bg-gray-100 rounded-full p-6 inline-block mb-4">
+                <i class="fa fa-shield text-gray-400 text-5xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">No Privacy Policies</h3>
+            <p class="text-gray-600 mb-6">Get started by creating your first privacy policy</p>
+            <a href="{{url('/')}}/admin/addPrivacy" 
+               class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-semibold hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md hover:shadow-lg transition-all">
+                <i class="fa fa-plus mr-2"></i> Add First Policy
+            </a>
+        </div>
+        @endforelse
+    </div>
 </div>
-{{--  --}}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function deletePrivacy(id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading
+            Swal.fire({
+                title: 'Deleting...',
+                text: 'Please wait',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('_token', document.querySelector('meta[name=csrf-token]').content);
+
+            // Make AJAX request
+            fetch('{{url('/')}}/admin/deletePrivacyAjax', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.fire({
+                    title: 'Deleted!',
+                    text: 'Privacy policy has been deleted.',
+                    icon: 'success',
+                    confirmButtonColor: '#6366f1'
+                }).then(() => {
+                    location.reload();
+                });
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Something went wrong. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#6366f1'
+                });
+            });
+        }
+    });
+}
+</script>
+
 @endsection

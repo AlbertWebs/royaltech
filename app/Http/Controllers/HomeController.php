@@ -14,19 +14,19 @@ class HomeController extends Controller
 {
     public function index()
     {
-        SEOMeta::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya');
+        SEOMeta::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya - Laptops Rentals Etc');
         SEOMeta::setDescription('Rent Laptops, Lease Laptops, Laptops for Hire,  Laptops in Kenya, Laptop Rentals in Kenya, Laptops Leasing in Kenya');
         SEOMeta::setCanonical(''.url('/').'');
 
         OpenGraph::setDescription('Rent Laptops, Lease Laptops, Laptops for Hire,  Laptops in Kenya, Laptop Rentals in Kenya, Laptops Leasing in Kenya');
-        OpenGraph::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya');
+        OpenGraph::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya - Laptops Rentals Etc');
         OpenGraph::setUrl(''.url('/').'');
         OpenGraph::addProperty('type', 'website');
 
-        TwitterCard::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya');
+        TwitterCard::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya - Laptops Rentals Etc');
         TwitterCard::setSite('@RoyaltechC');
 
-        JsonLd::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya');
+        JsonLd::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya - Laptops Rentals Etc');
         JsonLd::setDescription('Rent Laptops, Lease Laptops, Laptops for Hire,  Laptops in Kenya, Laptop Rentals in Kenya, Laptops Leasing in Kenya');
         JsonLd::addImage(''.url('/').'/uploads/Royaltech-Original-1.png');
         return view('front.index');

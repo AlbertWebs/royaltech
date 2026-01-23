@@ -182,7 +182,7 @@ Route::post('admin/edit_Banner/{id}', [AdminsController::class, 'edit_Banner'])-
 // Messages
 Route::get('admin/allMessages', [AdminsController::class, 'allMessages'])->middleware('is_admin');
 Route::get('admin/unread', [AdminsController::class, 'unread'])->middleware('is_admin');
-Route::post('admin/reply', [AdminsController::class, 'reply'])->middleware('is_admin');
+Route::post('admin/reply/{id}', [AdminsController::class, 'reply'])->middleware('is_admin');
 Route::get('admin/read/{id}', [AdminsController::class, 'read'])->middleware('is_admin');
 Route::get('admin/deleteMessage/{id}', [AdminsController::class, 'deleteMessage'])->middleware('is_admin');
 
