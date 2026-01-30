@@ -268,6 +268,13 @@
                 </div>
             </div>
 
+            <!-- Laptop Hire Requests -->
+            <a href="{{url('/')}}/admin/laptop-hire-requests" 
+               class="flex items-center px-4 py-3 text-sm font-medium rounded-xl text-gray-300 hover:bg-gradient-to-r hover:from-indigo-600/20 hover:to-purple-600/20 hover:text-white hover:border-indigo-500/30 border {{ request()->is('admin/laptop-hire-request*') ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25 border-indigo-500/50' : 'border-gray-700/20' }} transition-all duration-200 group">
+                <i class="fa fa-laptop mr-3 w-5 text-center group-hover:scale-110 transition-transform"></i> 
+                <span>Laptop Hire Requests</span>
+            </a>
+
             <!-- Divider -->
             <div class="my-4 border-t border-gray-800"></div>
 
@@ -294,6 +301,10 @@
                     <a href="{{url('/')}}/admin/mailerSettings" 
                        class="block px-4 py-2.5 text-sm rounded-lg text-gray-400 hover:bg-indigo-600/10 hover:text-indigo-300 border border-transparent hover:border-indigo-500/20 transition-all duration-200 {{ request()->is('admin/mailerSettings') ? 'bg-indigo-600/10 text-indigo-300 border-indigo-500/30' : 'border-gray-700/10' }}">
                         <i class="fa fa-envelope mr-2"></i> Mailer Settings
+                    </a>
+                    <a href="{{url('/')}}/admin/test-email" 
+                       class="block px-4 py-2.5 text-sm rounded-lg text-gray-400 hover:bg-indigo-600/10 hover:text-indigo-300 border border-transparent hover:border-indigo-500/20 transition-all duration-200 {{ request()->is('admin/test-email') ? 'bg-indigo-600/10 text-indigo-300 border-indigo-500/30' : 'border-gray-700/10' }}">
+                        <i class="fa fa-paper-plane mr-2"></i> Test Email
                     </a>
                     <a href="{{url('/')}}/admin/credentials" 
                        class="block px-4 py-2.5 text-sm rounded-lg text-gray-400 hover:bg-indigo-600/10 hover:text-indigo-300 border border-transparent hover:border-indigo-500/20 transition-all duration-200 {{ request()->is('admin/credentials') ? 'bg-indigo-600/10 text-indigo-300 border-indigo-500/30' : 'border-gray-700/10' }}">

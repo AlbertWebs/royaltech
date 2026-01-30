@@ -14,7 +14,9 @@ class LaptopHireRequest extends Model
         'number_of_laptops',
         'desired_specs',
         'status',
-        'admin_notes'
+        'admin_notes',
+        'email_sent',
+        'email_error'
     ];
 
     protected $casts = [

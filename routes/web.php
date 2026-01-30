@@ -106,6 +106,8 @@ Route::post('admin/logo-and-favicon-update', [AdminsController::class, 'logo_and
 
 // mailerSettings
 Route::get('admin/mailerSettings', [AdminsController::class, 'mailerSettings'])->middleware('is_admin');
+Route::get('admin/test-email', [AdminsController::class, 'testEmail'])->middleware('is_admin');
+Route::post('admin/send-test-email', [AdminsController::class, 'sendTestEmail'])->middleware('is_admin');
 
 // Terms and Conditions
 Route::get('admin/terms', [AdminsController::class, 'terms'])->middleware('is_admin');
@@ -186,6 +188,11 @@ Route::get('admin/unread', [AdminsController::class, 'unread'])->middleware('is_
 Route::post('admin/reply/{id}', [AdminsController::class, 'reply'])->middleware('is_admin');
 Route::get('admin/read/{id}', [AdminsController::class, 'read'])->middleware('is_admin');
 Route::get('admin/deleteMessage/{id}', [AdminsController::class, 'deleteMessage'])->middleware('is_admin');
+
+// Laptop Hire Requests
+Route::get('admin/laptop-hire-requests', [AdminsController::class, 'laptopHireRequests'])->middleware('is_admin');
+Route::get('admin/laptop-hire-request/{id}', [AdminsController::class, 'viewLaptopHireRequest'])->middleware('is_admin');
+Route::post('admin/update-hire-request-status/{id}', [AdminsController::class, 'updateHireRequestStatus'])->middleware('is_admin');
 
 // Categories
 Route::get('admin/categories', [AdminsController::class, 'categories'])->middleware('is_admin');

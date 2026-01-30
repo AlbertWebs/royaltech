@@ -114,7 +114,7 @@ class ReplyMessage extends Model
         });
     }
 
-    public static function laptopHire($name,$email,$Joiner){
+    public static function laptopHire($name, $email, $Joiner, $hireRequest = null){
         $data = array(
             'content'=>$Joiner
         );
@@ -127,6 +127,8 @@ class ReplyMessage extends Model
         $toVariable = $SiteSettings->email_one ?? 'info@royaltech.co.ke';
         $toVariableName = "Royaltech Computers Limited";
         
+        $errorMessage = null;
+        
         try {
             // Use site settings email or fallback
             $ccEmails = [];
@@ -136,6 +138,11 @@ class ReplyMessage extends Model
             // Add sales email if different from main email
             if (!empty($SiteSettings->email_one) && $SiteSettings->email_one !== 'sales@royaltech.co.ke') {
                 $ccEmails[] = 'sales@royaltech.co.ke';
+            }
+
+            // Validate email addresses
+            if (!filter_var($toVariable, FILTER_VALIDATE_EMAIL)) {
+                throw new \Exception("Invalid recipient email address: {$toVariable}");
             }
 
             Mail::send('mailContact', $data, function($message) use ($subject,$FromVariable,$FromVariableName,$toVariable,$toVariableName,$email,$ccEmails){
@@ -155,14 +162,25 @@ class ReplyMessage extends Model
                 $message->subject($subject);
             });
             
-            return true;
+            \Log::info('Laptop Hire Email Sent Successfully', [
+                'to' => $toVariable,
+                'from' => $email,
+                'name' => $name
+            ]);
+            
+            return ['success' => true, 'error' => null];
         } catch (\Exception $e) {
-            // Log the error
+            $errorMessage = $e->getMessage();
+            
+            // Log the error with full details
             \Log::error('Laptop Hire Email Error: ' . $e->getMessage(), [
                 'name' => $name,
                 'email' => $email,
                 'to' => $toVariable,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
             ]);
             
             // Try sending to fallback email
@@ -174,11 +192,23 @@ class ReplyMessage extends Model
                     $message->replyTo($email);
                     $message->subject($subject . ' [FALLBACK]');
                 });
+                
+                \Log::info('Laptop Hire Fallback Email Sent Successfully', [
+                    'to' => $fallbackEmail,
+                    'from' => $email
+                ]);
+                
+                return ['success' => true, 'error' => 'Primary email failed, but fallback email sent'];
             } catch (\Exception $fallbackException) {
-                \Log::error('Laptop Hire Fallback Email Also Failed: ' . $fallbackException->getMessage());
+                $errorMessage = "Primary: {$e->getMessage()}; Fallback: {$fallbackException->getMessage()}";
+                \Log::error('Laptop Hire Fallback Email Also Failed: ' . $fallbackException->getMessage(), [
+                    'primary_error' => $e->getMessage(),
+                    'fallback_error' => $fallbackException->getMessage(),
+                    'trace' => $fallbackException->getTraceAsString()
+                ]);
             }
             
-            return false;
+            return ['success' => false, 'error' => $errorMessage];
         }
     }
 

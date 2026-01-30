@@ -48,6 +48,8 @@ use App\Models\SendMails;
 
 use App\Models\Product;
 
+use App\Models\LaptopHireRequest;
+
 use Illuminate\Http\Request;
 
 use BinaryCats\Sku\HasSku;
@@ -63,6 +65,10 @@ use Redirect;
 use Illuminate\Support\Facades\Crypt;
 
 use Illuminate\Support\Str;
+
+use Mail;
+
+use Illuminate\Support\Facades\Log;
 
 class AdminsController extends Controller
 {
@@ -123,6 +129,86 @@ class AdminsController extends Controller
         activity()->log('User Accessed Mailer Settings Page');
         $SiteSettings = DB::table('email_settings')->get();
         return view('admin.mailerSettings',compact('SiteSettings'));
+    }
+
+    // Email Testing Tool
+    public function testEmail(){
+        activity()->log('Accessed Email Testing Tool');
+        $SiteSettings = DB::table('_site_settings')->first();
+        $page_title = 'formfiletext';
+        $page_name = 'Test Email';
+        return view('admin.test_email', compact('page_title', 'page_name', 'SiteSettings'));
+    }
+
+    public function sendTestEmail(Request $request){
+        activity()->log('Sent Test Email');
+        $request->validate([
+            'to_email' => 'required|email',
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string'
+        ]);
+
+        $toEmail = $request->to_email;
+        $subject = $request->subject;
+        $messageContent = $request->message;
+        
+        // Get site settings for from email
+        $SiteSettings = DB::table('_site_settings')->first();
+        $fromEmail = config('mail.from.address', 'royaltechcomputersltd@gmail.com');
+        $fromName = config('mail.from.name', 'Royaltech Company Limited');
+
+        $result = [
+            'success' => false,
+            'message' => '',
+            'error' => null
+        ];
+
+        try {
+            $data = [
+                'content' => $messageContent,
+                'subject' => $subject
+            ];
+
+            Mail::send('mailContact', $data, function($message) use ($subject, $fromEmail, $fromName, $toEmail) {
+                $message->from($fromEmail, $fromName);
+                $message->to($toEmail);
+                $message->subject($subject . ' [TEST EMAIL]');
+            });
+
+            Log::info('Test email sent successfully', [
+                'to' => $toEmail,
+                'from' => $fromEmail,
+                'subject' => $subject
+            ]);
+
+            $result['success'] = true;
+            $result['message'] = 'Test email sent successfully! Check your inbox.';
+            
+            Session::flash('email_test_success', true);
+            Session::flash('email_test_message', $result['message']);
+            
+        } catch (\Exception $e) {
+            $errorMessage = $e->getMessage();
+            
+            Log::error('Test email failed', [
+                'to' => $toEmail,
+                'from' => $fromEmail,
+                'error' => $errorMessage,
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            $result['success'] = false;
+            $result['message'] = 'Failed to send test email';
+            $result['error'] = $errorMessage;
+            
+            Session::flash('email_test_success', false);
+            Session::flash('email_test_message', $result['message']);
+            Session::flash('email_test_error', $errorMessage);
+        }
+
+        return redirect()->back()->with('result', $result);
     }
 
 
@@ -512,6 +598,41 @@ class AdminsController extends Controller
         activity()->log('Deleted Message ID number '.$id.' ');
         DB::table('messages')->where('id',$id)->delete();
         return Redirect::back();
+    }
+
+    // Laptop Hire Requests
+    public function laptopHireRequests(){
+        activity()->log('Accessed Laptop Hire Requests');
+        $HireRequests = LaptopHireRequest::orderBy('created_at', 'desc')->get();
+        $page_title = 'list';
+        $page_name = 'Laptop Hire Requests';
+        return view('admin.laptop_hire_requests', compact('page_title', 'HireRequests', 'page_name'));
+    }
+
+    public function viewLaptopHireRequest($id){
+        activity()->log('Viewed Laptop Hire Request ID '.$id);
+        $HireRequest = LaptopHireRequest::findOrFail($id);
+        $page_title = 'formfiletext';
+        $page_name = 'Laptop Hire Request';
+        return view('admin.view_laptop_hire_request', compact('page_title', 'HireRequest', 'page_name'));
+    }
+
+    public function updateHireRequestStatus(Request $request, $id){
+        activity()->log('Updated Laptop Hire Request Status ID '.$id);
+        $request->validate([
+            'status' => 'required|in:pending,contacted,confirmed,completed,cancelled',
+            'admin_notes' => 'nullable|string|max:1000'
+        ]);
+
+        $hireRequest = LaptopHireRequest::findOrFail($id);
+        $hireRequest->status = $request->status;
+        if($request->has('admin_notes')){
+            $hireRequest->admin_notes = $request->admin_notes;
+        }
+        $hireRequest->save();
+
+        Session::flash('message', 'Hire request status updated successfully');
+        return redirect()->back();
     }
 
     // Categories Here

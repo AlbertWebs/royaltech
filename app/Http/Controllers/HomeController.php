@@ -279,6 +279,7 @@ class HomeController extends Controller
                     $message = $request->message;
 
                     // Save to database first
+                    $hireRequest = null;
                     try {
                         $hireRequest = LaptopHireRequest::create([
                             'name' => $name,
@@ -287,13 +288,15 @@ class HomeController extends Controller
                             'pickup_date' => $date,
                             'number_of_laptops' => $number,
                             'desired_specs' => $message,
-                            'status' => 'pending'
+                            'status' => 'pending',
+                            'email_sent' => false
                         ]);
                     } catch (\Exception $dbException) {
                         \Log::error('Failed to save laptop hire request to database: ' . $dbException->getMessage(), [
                             'name' => $name,
                             'email' => $email,
-                            'phone' => $phone
+                            'phone' => $phone,
+                            'exception' => $dbException->getTraceAsString()
                         ]);
                         // Continue with email even if DB save fails
                     }
@@ -301,7 +304,24 @@ class HomeController extends Controller
                     // Send email notification
                     $Joiner = "Hello Admin,\n\nUser Details:\n- Name: $name\n- Email: $email\n- Phone Number: $phone\n- Pick-up/Delivery Date: $date\n- Number of Laptops: $number\n- Desired Specs/Model: $message\n\nPlease contact the user to confirm the laptop hire request.";
                     
-                    $emailSent = ReplyMessage::laptopHire($name,$email,$Joiner);
+                    $emailResult = ReplyMessage::laptopHire($name, $email, $Joiner, $hireRequest);
+                    
+                    // Update email status if request was saved
+                    if ($hireRequest) {
+                        $hireRequest->email_sent = $emailResult['success'] ?? false;
+                        $hireRequest->email_error = $emailResult['error'] ?? null;
+                        $hireRequest->save();
+                    }
+                    
+                    // Log email status
+                    if (!($emailResult['success'] ?? false)) {
+                        \Log::warning('Laptop hire email failed', [
+                            'request_id' => $hireRequest->id ?? 'unknown',
+                            'name' => $name,
+                            'email' => $email,
+                            'error' => $emailResult['error'] ?? 'Unknown error'
+                        ]);
+                    }
                     
                     // Always return success if database save worked, even if email fails
                     return response()->json([
