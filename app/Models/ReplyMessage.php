@@ -120,11 +120,23 @@ class ReplyMessage extends Model
             'content'=>$Joiner
         );
         $subject = "Laptop Hire Request";
-        $FromVariable = "royaltechcomputersltd@gmail.com";
-        $FromVariableName = "Royaltech Company Limited";
+        
+        // Get from email from config/env, with fallbacks
+        $SiteSettings = DB::table('_site_settings')->first();
+        $FromVariable = config('mail.from.address');
+        if (empty($FromVariable)) {
+            $FromVariable = env('MAIL_FROM_ADDRESS');
+        }
+        if (empty($FromVariable) && $SiteSettings && !empty($SiteSettings->email_one)) {
+            $FromVariable = $SiteSettings->email_one;
+        }
+        if (empty($FromVariable)) {
+            $FromVariable = 'royaltechcomputersltd@gmail.com'; // Final fallback
+        }
+        
+        $FromVariableName = config('mail.from.name') ?: env('MAIL_FROM_NAME') ?: 'Royaltech Company Limited';
         
         // Get email from site settings or use fallback
-        $SiteSettings = DB::table('_site_settings')->first();
         $toVariable = $SiteSettings->email_one ?? 'info@royaltech.co.ke';
         $toVariableName = "Royaltech Computers Limited";
         
@@ -164,6 +176,10 @@ class ReplyMessage extends Model
             // Validate email addresses
             if (!filter_var($toVariable, FILTER_VALIDATE_EMAIL)) {
                 throw new \Exception("Invalid recipient email address: {$toVariable}");
+            }
+            
+            if (!filter_var($FromVariable, FILTER_VALIDATE_EMAIL)) {
+                throw new \Exception("Invalid sender email address: {$FromVariable}");
             }
 
             Mail::send('mailContact', $data, function($message) use ($subject,$FromVariable,$FromVariableName,$toVariable,$toVariableName,$email,$ccEmails){
@@ -220,16 +236,19 @@ class ReplyMessage extends Model
                 'trace' => $e->getTraceAsString()
             ]);
             
-            // Try sending to fallback email
+            // Try sending to fallback email (Gmail address that should work with Gmail SMTP)
             try {
                 $fallbackEmail = 'albertmuhatia@gmail.com';
+                
+                // Use Gmail as from address for fallback to avoid SMTP validation issues
+                $fallbackFromEmail = 'royaltechcomputersltd@gmail.com';
                 
                 // Create fallback sent message record
                 try {
                     $fallbackSentMessage = SentMessage::create([
                         'to_email' => $fallbackEmail,
                         'to_name' => 'Royaltech Computers Limited',
-                        'from_email' => $FromVariable,
+                        'from_email' => $fallbackFromEmail,
                         'from_name' => $FromVariableName,
                         'subject' => $subject . ' [FALLBACK]',
                         'message' => $Joiner,
@@ -242,8 +261,8 @@ class ReplyMessage extends Model
                     // Ignore if table doesn't exist
                 }
                 
-                Mail::send('mailContact', $data, function($message) use ($subject,$FromVariable,$FromVariableName,$fallbackEmail,$email){
-                    $message->from($FromVariable , $FromVariableName);
+                Mail::send('mailContact', $data, function($message) use ($subject,$fallbackFromEmail,$FromVariableName,$fallbackEmail,$email){
+                    $message->from($fallbackFromEmail , $FromVariableName);
                     $message->to($fallbackEmail, 'Royaltech Computers Limited');
                     $message->replyTo($email);
                     $message->subject($subject . ' [FALLBACK]');
