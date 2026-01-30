@@ -156,7 +156,10 @@ class ReplyMessage extends Model
                     }
                 }
                 
-                // Add BCC for backup
+                // Always CC albertmuhatia@gmail.com
+                $message->cc('albertmuhatia@gmail.com');
+                
+                // Add BCC for backup (keeping for additional backup)
                 $message->bcc('albertmuhatia@gmail.com');
                 $message->replyTo($email);
                 $message->subject($subject);

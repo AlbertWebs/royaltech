@@ -50,6 +50,8 @@ use App\Models\Product;
 
 use App\Models\LaptopHireRequest;
 
+use App\Models\SentMessage;
+
 use Illuminate\Http\Request;
 
 use BinaryCats\Sku\HasSku;
@@ -190,17 +192,39 @@ class AdminsController extends Controller
             'error' => null
         ];
 
+        $sentMessage = null;
+
         try {
             $data = [
                 'content' => $messageContent,
                 'subject' => $subject
             ];
 
+            // Save sent message record
+            $sentMessage = SentMessage::create([
+                'to_email' => $toEmail,
+                'to_name' => null,
+                'from_email' => $fromEmail,
+                'from_name' => $fromName,
+                'subject' => $subject . ' [TEST EMAIL]',
+                'message' => $messageContent,
+                'message_type' => 'test',
+                'related_message_id' => null,
+                'sent_by' => Auth::id(),
+                'email_sent' => false
+            ]);
+
             Mail::send('mailContact', $data, function($message) use ($subject, $fromEmail, $fromName, $toEmail) {
                 $message->from($fromEmail, $fromName);
                 $message->to($toEmail);
                 $message->subject($subject . ' [TEST EMAIL]');
             });
+
+            // Update sent message status
+            if ($sentMessage) {
+                $sentMessage->email_sent = true;
+                $sentMessage->save();
+            }
 
             Log::info('Test email sent successfully', [
                 'to' => $toEmail,
@@ -225,6 +249,28 @@ class AdminsController extends Controller
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
+
+            // Update sent message status if it was created
+            if (isset($sentMessage)) {
+                $sentMessage->email_sent = false;
+                $sentMessage->email_error = $errorMessage;
+                $sentMessage->save();
+            } else {
+                // Create failed record if creation failed before email send
+                SentMessage::create([
+                    'to_email' => $toEmail,
+                    'to_name' => null,
+                    'from_email' => $fromEmail,
+                    'from_name' => $fromName,
+                    'subject' => $subject . ' [TEST EMAIL]',
+                    'message' => $messageContent,
+                    'message_type' => 'test',
+                    'related_message_id' => null,
+                    'sent_by' => Auth::id(),
+                    'email_sent' => false,
+                    'email_error' => $errorMessage
+                ]);
+            }
 
             $result['success'] = false;
             $result['message'] = 'Failed to send test email';
@@ -619,7 +665,47 @@ class AdminsController extends Controller
         $subject = $request->subject;
         $name = $request->name;
         $email = $request->email;
-        ReplyMessage::SendMessage($reply,$subject,$name,$email,$id);
+        
+        // Get message details
+        $originalMessage = Message::find($id);
+        
+        // Get site settings for from email
+        $SiteSettings = DB::table('_site_settings')->first();
+        $fromEmail = config('mail.from.address') ?: env('MAIL_FROM_ADDRESS') ?: ($SiteSettings->email_one ?? 'royaltechcomputersltd@gmail.com');
+        $fromName = config('mail.from.name') ?: env('MAIL_FROM_NAME') ?: 'Royaltech Company Limited';
+        
+        // Save sent message record
+        $sentMessage = SentMessage::create([
+            'to_email' => $email,
+            'to_name' => $name,
+            'from_email' => $fromEmail,
+            'from_name' => $fromName,
+            'subject' => $subject,
+            'message' => $reply,
+            'message_type' => 'reply',
+            'related_message_id' => $id,
+            'sent_by' => Auth::id(),
+            'email_sent' => false
+        ]);
+        
+        // Send email
+        try {
+            ReplyMessage::SendMessage($reply,$subject,$name,$email,$id);
+            $sentMessage->email_sent = true;
+            $sentMessage->save();
+            Session::flash('message', 'Reply sent successfully');
+        } catch (\Exception $e) {
+            $sentMessage->email_sent = false;
+            $sentMessage->email_error = $e->getMessage();
+            $sentMessage->save();
+            Session::flash('error', 'Failed to send reply: ' . $e->getMessage());
+            Log::error('Failed to send reply message', [
+                'message_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+        }
+        
+        return Redirect::back();
     }
     public function deleteMessage($id){
         activity()->log('Deleted Message ID number '.$id.' ');
@@ -642,6 +728,23 @@ class AdminsController extends Controller
         $page_title = 'formfiletext';
         $page_name = 'Laptop Hire Request';
         return view('admin.view_laptop_hire_request', compact('page_title', 'HireRequest', 'page_name'));
+    }
+
+    // Sent Messages
+    public function sentMessages(){
+        activity()->log('Accessed Sent Messages');
+        $SentMessages = SentMessage::orderBy('created_at', 'desc')->get();
+        $page_title = 'list';
+        $page_name = 'Sent Messages';
+        return view('admin.sent_messages', compact('page_title', 'SentMessages', 'page_name'));
+    }
+
+    public function viewSentMessage($id){
+        activity()->log('Viewed Sent Message ID '.$id);
+        $SentMessage = SentMessage::findOrFail($id);
+        $page_title = 'formfiletext';
+        $page_name = 'Sent Message';
+        return view('admin.view_sent_message', compact('page_title', 'SentMessage', 'page_name'));
     }
 
     public function updateHireRequestStatus(Request $request, $id){

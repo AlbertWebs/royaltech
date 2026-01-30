@@ -275,6 +275,13 @@
                 <span>Laptop Hire Requests</span>
             </a>
 
+            <!-- Sent Messages -->
+            <a href="{{url('/')}}/admin/sent-messages" 
+               class="flex items-center px-4 py-3 text-sm font-medium rounded-xl text-gray-300 hover:bg-gradient-to-r hover:from-indigo-600/20 hover:to-purple-600/20 hover:text-white hover:border-indigo-500/30 border {{ request()->is('admin/sent-message*') ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25 border-indigo-500/50' : 'border-gray-700/20' }} transition-all duration-200 group">
+                <i class="fa fa-paper-plane mr-3 w-5 text-center group-hover:scale-110 transition-transform"></i> 
+                <span>Sent Messages</span>
+            </a>
+
             <!-- Divider -->
             <div class="my-4 border-t border-gray-800"></div>
 

@@ -188,6 +188,8 @@ Route::get('admin/unread', [AdminsController::class, 'unread'])->middleware('is_
 Route::post('admin/reply/{id}', [AdminsController::class, 'reply'])->middleware('is_admin');
 Route::get('admin/read/{id}', [AdminsController::class, 'read'])->middleware('is_admin');
 Route::get('admin/deleteMessage/{id}', [AdminsController::class, 'deleteMessage'])->middleware('is_admin');
+Route::get('admin/sent-messages', [AdminsController::class, 'sentMessages'])->middleware('is_admin');
+Route::get('admin/sent-message/{id}', [AdminsController::class, 'viewSentMessage'])->middleware('is_admin');
 
 // Laptop Hire Requests
 Route::get('admin/laptop-hire-requests', [AdminsController::class, 'laptopHireRequests'])->middleware('is_admin');
