@@ -72,6 +72,8 @@ use Mail;
 
 use Illuminate\Support\Facades\Log;
 
+use Illuminate\Support\Facades\Auth;
+
 class AdminsController extends Controller
 {
      /**
