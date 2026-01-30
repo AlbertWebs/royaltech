@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Mail;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
+use App\Models\SentMessage;
 use Darryldecode\Cart\Cart;
 use Darryldecode\Cart\CartCondition;
 use Redirect;
@@ -128,6 +129,26 @@ class ReplyMessage extends Model
         $toVariableName = "Royaltech Computers Limited";
         
         $errorMessage = null;
+        $sentMessage = null;
+        
+        // Create sent message record before sending
+        try {
+            $sentMessage = SentMessage::create([
+                'to_email' => $toVariable,
+                'to_name' => $toVariableName,
+                'from_email' => $FromVariable,
+                'from_name' => $FromVariableName,
+                'subject' => $subject,
+                'message' => $Joiner,
+                'message_type' => 'hire_request',
+                'related_message_id' => $hireRequest ? $hireRequest->id : null,
+                'sent_by' => Auth::check() ? Auth::id() : null,
+                'email_sent' => false
+            ]);
+        } catch (\Exception $dbException) {
+            \Log::warning('Failed to create sent_messages record: ' . $dbException->getMessage());
+            // Continue even if sent_messages table doesn't exist
+        }
         
         try {
             // Use site settings email or fallback
@@ -165,6 +186,12 @@ class ReplyMessage extends Model
                 $message->subject($subject);
             });
             
+            // Update sent message status
+            if ($sentMessage) {
+                $sentMessage->email_sent = true;
+                $sentMessage->save();
+            }
+            
             \Log::info('Laptop Hire Email Sent Successfully', [
                 'to' => $toVariable,
                 'from' => $email,
@@ -174,6 +201,13 @@ class ReplyMessage extends Model
             return ['success' => true, 'error' => null];
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
+            
+            // Update sent message status if record exists
+            if ($sentMessage) {
+                $sentMessage->email_sent = false;
+                $sentMessage->email_error = $errorMessage;
+                $sentMessage->save();
+            }
             
             // Log the error with full details
             \Log::error('Laptop Hire Email Error: ' . $e->getMessage(), [
@@ -189,12 +223,37 @@ class ReplyMessage extends Model
             // Try sending to fallback email
             try {
                 $fallbackEmail = 'albertmuhatia@gmail.com';
+                
+                // Create fallback sent message record
+                try {
+                    $fallbackSentMessage = SentMessage::create([
+                        'to_email' => $fallbackEmail,
+                        'to_name' => 'Royaltech Computers Limited',
+                        'from_email' => $FromVariable,
+                        'from_name' => $FromVariableName,
+                        'subject' => $subject . ' [FALLBACK]',
+                        'message' => $Joiner,
+                        'message_type' => 'hire_request_fallback',
+                        'related_message_id' => $hireRequest ? $hireRequest->id : null,
+                        'sent_by' => Auth::check() ? Auth::id() : null,
+                        'email_sent' => false
+                    ]);
+                } catch (\Exception $dbException) {
+                    // Ignore if table doesn't exist
+                }
+                
                 Mail::send('mailContact', $data, function($message) use ($subject,$FromVariable,$FromVariableName,$fallbackEmail,$email){
                     $message->from($FromVariable , $FromVariableName);
                     $message->to($fallbackEmail, 'Royaltech Computers Limited');
                     $message->replyTo($email);
                     $message->subject($subject . ' [FALLBACK]');
                 });
+                
+                // Update fallback sent message status
+                if (isset($fallbackSentMessage)) {
+                    $fallbackSentMessage->email_sent = true;
+                    $fallbackSentMessage->save();
+                }
                 
                 \Log::info('Laptop Hire Fallback Email Sent Successfully', [
                     'to' => $fallbackEmail,
@@ -204,6 +263,14 @@ class ReplyMessage extends Model
                 return ['success' => true, 'error' => 'Primary email failed, but fallback email sent'];
             } catch (\Exception $fallbackException) {
                 $errorMessage = "Primary: {$e->getMessage()}; Fallback: {$fallbackException->getMessage()}";
+                
+                // Update fallback sent message status if it exists
+                if (isset($fallbackSentMessage)) {
+                    $fallbackSentMessage->email_sent = false;
+                    $fallbackSentMessage->email_error = $fallbackException->getMessage();
+                    $fallbackSentMessage->save();
+                }
+                
                 \Log::error('Laptop Hire Fallback Email Also Failed: ' . $fallbackException->getMessage(), [
                     'primary_error' => $e->getMessage(),
                     'fallback_error' => $fallbackException->getMessage(),
