@@ -168,7 +168,7 @@ class AdminsController extends Controller
             $fromEmail = $SiteSettings->email_one;
         }
         if (empty($fromEmail)) {
-            $fromEmail = 'royaltechcomputersltd@gmail.com'; // Final fallback
+            $fromEmail = 'royaltech2022@gmail.com'; // Final fallback
         }
         
         // Get from name with fallbacks
@@ -673,7 +673,7 @@ class AdminsController extends Controller
         
         // Get site settings for from email
         $SiteSettings = DB::table('_site_settings')->first();
-        $fromEmail = config('mail.from.address') ?: env('MAIL_FROM_ADDRESS') ?: ($SiteSettings->email_one ?? 'royaltechcomputersltd@gmail.com');
+        $fromEmail = config('mail.from.address') ?: env('MAIL_FROM_ADDRESS') ?: ($SiteSettings->email_one ?? 'royaltech2022@gmail.com');
         $fromName = config('mail.from.name') ?: env('MAIL_FROM_NAME') ?: 'Royaltech Company Limited';
         
         // Save sent message record

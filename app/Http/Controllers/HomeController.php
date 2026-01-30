@@ -270,29 +270,90 @@ class HomeController extends Controller
         try {
             // Honeypot validation - if any honeypot field is filled, it's a bot
             $honeypotFields = [
-                'website' => $request->website,
-                'company_name' => $request->company_name,
-                'phone_alt' => $request->phone_alt
+                'website' => $request->input('website'),
+                'company_name' => $request->input('company_name'),
+                'phone_alt' => $request->input('phone_alt')
             ];
             
+            // Validate honeypot fields - check for any non-empty values
             foreach ($honeypotFields as $field => $value) {
-                if (!empty($value)) {
-                    // Log potential spam attempt
-                    \Log::warning('Honeypot field filled - potential spam', [
+                // Check if field exists and has a non-empty value (including whitespace-only)
+                if ($value !== null && trim($value) !== '') {
+                    // Log potential spam attempt with detailed information
+                    \Log::warning('Honeypot field filled - potential spam detected', [
                         'field' => $field,
-                        'value' => $value,
+                        'value' => substr($value, 0, 100), // Limit value length in log
                         'ip' => $request->ip(),
                         'user_agent' => $request->userAgent(),
-                        'name' => $request->name ?? 'unknown',
-                        'email' => $request->email ?? 'unknown'
+                        'referer' => $request->header('referer'),
+                        'name' => $request->input('name', 'unknown'),
+                        'email' => $request->input('email', 'unknown'),
+                        'phone' => $request->input('phone', 'unknown'),
+                        'timestamp' => now()->toDateTimeString()
                     ]);
                     
                     // Return success silently to avoid alerting bots
+                    // This makes bots think their submission was successful
                     return response()->json([
                         'success' => true, 
                         'message' => 'Your request has been submitted successfully. We will get back to you soon.'
-                    ]);
+                    ], 200);
                 }
+            }
+            
+            // Additional validation: Check if required user-facing fields are missing (bot behavior)
+            $requiredFields = ['name', 'email', 'phone', 'date', 'number', 'message', 'verify_contact_input'];
+            foreach ($requiredFields as $field) {
+                if (!$request->has($field) || trim($request->input($field)) === '') {
+                    \Log::warning('Missing required field in hire request', [
+                        'field' => $field,
+                        'ip' => $request->ip(),
+                        'user_agent' => $request->userAgent(),
+                        'all_fields' => $request->except(['_token', 'website', 'company_name', 'phone_alt'])
+                    ]);
+                    return response()->json([
+                        'success' => false, 
+                        'message' => 'Please fill in all required fields.'
+                    ], 422);
+                }
+            }
+            
+            // Validate email format
+            if (!filter_var($request->input('email'), FILTER_VALIDATE_EMAIL)) {
+                \Log::warning('Invalid email format in hire request', [
+                    'email' => $request->input('email'),
+                    'ip' => $request->ip()
+                ]);
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Please provide a valid email address.'
+                ], 422);
+            }
+            
+            // Validate phone number (basic check - should contain digits)
+            $phone = $request->input('phone');
+            if (!preg_match('/^[\d\s\-\+\(\)]+$/', $phone) || strlen(trim($phone)) < 8) {
+                \Log::warning('Invalid phone format in hire request', [
+                    'phone' => $phone,
+                    'ip' => $request->ip()
+                ]);
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Please provide a valid phone number.'
+                ], 422);
+            }
+            
+            // Validate number of laptops (should be positive integer)
+            $number = $request->input('number');
+            if (!is_numeric($number) || (int)$number < 1 || (int)$number > 1000) {
+                \Log::warning('Invalid number of laptops in hire request', [
+                    'number' => $number,
+                    'ip' => $request->ip()
+                ]);
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Please provide a valid number of laptops (1-1000).'
+                ], 422);
             }
             
             $check = $this->has_url($request->message);
@@ -328,10 +389,8 @@ class HomeController extends Controller
                         // Continue with email even if DB save fails
                     }
 
-                    // Send email notification
-                    $Joiner = "Hello Admin,\n\nUser Details:\n- Name: $name\n- Email: $email\n- Phone Number: $phone\n- Pick-up/Delivery Date: $date\n- Number of Laptops: $number\n- Desired Specs/Model: $message\n\nPlease contact the user to confirm the laptop hire request.";
-                    
-                    $emailResult = ReplyMessage::laptopHire($name, $email, $Joiner, $hireRequest);
+                    // Send email notification with structured data
+                    $emailResult = ReplyMessage::laptopHire($name, $email, $phone, $date, $number, $message, $hireRequest);
                     
                     // Update email status if request was saved
                     if ($hireRequest) {

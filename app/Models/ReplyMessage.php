@@ -39,7 +39,7 @@ class ReplyMessage extends Model
         $appName = config('app.name');
         $appEmail = config('mail.username');
 
-        $FromVariable = "royaltechcomputersltd@gmail.com";
+        $FromVariable = "royaltech2022@gmail.com";
         $FromVariableName = "RoyalTech Computers Limited";
 
         $toVariable = $email;
@@ -65,7 +65,7 @@ class ReplyMessage extends Model
 
         );
 
-        $FromVariable = "royaltechcomputersltd@gmail.com";
+        $FromVariable = "royaltech2022@gmail.com";
         $FromVariableName = "RoyalTech Computers Limited Mailers";
 
         $toVariable = "info@royaltech.co.ke";
@@ -115,11 +115,26 @@ class ReplyMessage extends Model
         });
     }
 
-    public static function laptopHire($name, $email, $Joiner, $hireRequest = null){
+    public static function laptopHire($name, $email, $phone, $pickup_date, $number_of_laptops, $desired_specs, $hireRequest = null){
+        // Prepare structured data for email template
         $data = array(
-            'content'=>$Joiner
+            'name' => $name,
+            'phone' => $phone,
+            'pickup_date' => $pickup_date,
+            'number_of_laptops' => $number_of_laptops,
+            'desired_specs' => nl2br(e($desired_specs))
         );
-        $subject = "Laptop Hire Request";
+        
+        // Create plain text version for logging (without email address)
+        $plainTextContent = "New Equipment Hire Request\n\n";
+        $plainTextContent .= "Customer Name: {$name}\n";
+        $plainTextContent .= "Contact Phone: {$phone}\n";
+        $plainTextContent .= "Requested Date: {$pickup_date}\n";
+        $plainTextContent .= "Quantity: {$number_of_laptops} unit(s)\n";
+        $plainTextContent .= "Equipment Specifications:\n{$desired_specs}\n\n";
+        $plainTextContent .= "Please respond to this request at your earliest convenience.";
+        
+        $subject = "New Equipment Hire Request - " . $number_of_laptops . " Unit(s)";
         
         // Get from email from config/env, with fallbacks
         $SiteSettings = DB::table('_site_settings')->first();
@@ -131,7 +146,7 @@ class ReplyMessage extends Model
             $FromVariable = $SiteSettings->email_one;
         }
         if (empty($FromVariable)) {
-            $FromVariable = 'royaltechcomputersltd@gmail.com'; // Final fallback
+            $FromVariable = 'royaltech2022@gmail.com'; // Final fallback
         }
         
         $FromVariableName = config('mail.from.name') ?: env('MAIL_FROM_NAME') ?: 'Royaltech Company Limited';
@@ -151,7 +166,7 @@ class ReplyMessage extends Model
                 'from_email' => $FromVariable,
                 'from_name' => $FromVariableName,
                 'subject' => $subject,
-                'message' => $Joiner,
+                'message' => $plainTextContent,
                 'message_type' => 'hire_request',
                 'related_message_id' => $hireRequest ? $hireRequest->id : null,
                 'sent_by' => Auth::check() ? Auth::id() : null,
@@ -182,24 +197,33 @@ class ReplyMessage extends Model
                 throw new \Exception("Invalid sender email address: {$FromVariable}");
             }
 
-            Mail::send('mailContact', $data, function($message) use ($subject,$FromVariable,$FromVariableName,$toVariable,$toVariableName,$email,$ccEmails){
-                $message->from($FromVariable , $FromVariableName);
+            Mail::send('mailHireRequest', $data, function($message) use ($subject,$FromVariable,$FromVariableName,$toVariable,$toVariableName,$email,$ccEmails){
+                $message->from($FromVariable, $FromVariableName);
                 $message->to($toVariable, $toVariableName);
                 
-                // Add CC emails if they exist
+                // Add CC emails if they exist (limit to avoid spam triggers)
+                $ccCount = 0;
                 foreach ($ccEmails as $ccEmail) {
-                    if (!empty($ccEmail) && filter_var($ccEmail, FILTER_VALIDATE_EMAIL)) {
+                    if (!empty($ccEmail) && filter_var($ccEmail, FILTER_VALIDATE_EMAIL) && $ccCount < 2) {
                         $message->cc($ccEmail);
+                        $ccCount++;
                     }
                 }
                 
-                // Always CC albertmuhatia@gmail.com
-                $message->cc('albertmuhatia@gmail.com');
+                // Use BCC instead of CC for backup to avoid spam triggers
+                if (filter_var('albertmuhatia@gmail.com', FILTER_VALIDATE_EMAIL)) {
+                    $message->bcc('albertmuhatia@gmail.com');
+                }
                 
-                // Add BCC for backup (keeping for additional backup)
-                $message->bcc('albertmuhatia@gmail.com');
-                $message->replyTo($email);
+                // Set reply-to to customer email for easy response
+                $message->replyTo($email, $name);
+                
+                // Improve subject line
                 $message->subject($subject);
+                
+                // Add proper headers to reduce spam score
+                $message->getHeaders()->addTextHeader('X-Mailer', 'Royaltech Computers Limited');
+                $message->getHeaders()->addTextHeader('X-Priority', '1');
             });
             
             // Update sent message status
@@ -241,7 +265,7 @@ class ReplyMessage extends Model
                 $fallbackEmail = 'albertmuhatia@gmail.com';
                 
                 // Use Gmail as from address for fallback to avoid SMTP validation issues
-                $fallbackFromEmail = 'royaltechcomputersltd@gmail.com';
+                $fallbackFromEmail = 'royaltech2022@gmail.com';
                 
                 // Create fallback sent message record
                 try {
@@ -251,7 +275,7 @@ class ReplyMessage extends Model
                         'from_email' => $fallbackFromEmail,
                         'from_name' => $FromVariableName,
                         'subject' => $subject . ' [FALLBACK]',
-                        'message' => $Joiner,
+                        'message' => $plainTextContent,
                         'message_type' => 'hire_request_fallback',
                         'related_message_id' => $hireRequest ? $hireRequest->id : null,
                         'sent_by' => Auth::check() ? Auth::id() : null,
@@ -261,11 +285,12 @@ class ReplyMessage extends Model
                     // Ignore if table doesn't exist
                 }
                 
-                Mail::send('mailContact', $data, function($message) use ($subject,$fallbackFromEmail,$FromVariableName,$fallbackEmail,$email){
-                    $message->from($fallbackFromEmail , $FromVariableName);
+                Mail::send('mailHireRequest', $data, function($message) use ($subject,$fallbackFromEmail,$FromVariableName,$fallbackEmail,$email,$name){
+                    $message->from($fallbackFromEmail, $FromVariableName);
                     $message->to($fallbackEmail, 'Royaltech Computers Limited');
-                    $message->replyTo($email);
+                    $message->replyTo($email, $name);
                     $message->subject($subject . ' [FALLBACK]');
+                    $message->getHeaders()->addTextHeader('X-Mailer', 'Royaltech Computers Limited');
                 });
                 
                 // Update fallback sent message status
@@ -306,7 +331,7 @@ class ReplyMessage extends Model
             'content'=>$Joiner
         );
         $subject = "New Message";
-        $FromVariable = "royaltechcomputersltd@gmail.com";
+        $FromVariable = "royaltech2022@gmail.com";
         $FromVariableName = "Royaltech Company Limited";
         
         // Get email from site settings or use fallback
