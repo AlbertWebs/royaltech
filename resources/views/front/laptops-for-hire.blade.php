@@ -159,6 +159,18 @@ breaking your savings account.
 							<textarea name="message" placeholder="e.g. HP Folio 1080s, 8GB RAM, 512GB SSD, 2GB Graphics Card" rows="5" required></textarea>
 						</div>
 
+						<!-- Honeypot fields - hidden from users but visible to bots -->
+						<div style="position: absolute; left: -9999px; opacity: 0; visibility: hidden; height: 0; overflow: hidden;">
+							<label for="website">Website (leave blank)</label>
+							<input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+							
+							<label for="company_name">Company Name (leave blank)</label>
+							<input type="text" name="company_name" id="company_name" tabindex="-1" autocomplete="off">
+							
+							<label for="phone_alt">Alternative Phone (leave blank)</label>
+							<input type="tel" name="phone_alt" id="phone_alt" tabindex="-1" autocomplete="off">
+						</div>
+
                         <?php
 						$ops = array('-', '+');
 						$answer = -1;

@@ -268,6 +268,33 @@ class HomeController extends Controller
 
     public function hire(Request $request){
         try {
+            // Honeypot validation - if any honeypot field is filled, it's a bot
+            $honeypotFields = [
+                'website' => $request->website,
+                'company_name' => $request->company_name,
+                'phone_alt' => $request->phone_alt
+            ];
+            
+            foreach ($honeypotFields as $field => $value) {
+                if (!empty($value)) {
+                    // Log potential spam attempt
+                    \Log::warning('Honeypot field filled - potential spam', [
+                        'field' => $field,
+                        'value' => $value,
+                        'ip' => $request->ip(),
+                        'user_agent' => $request->userAgent(),
+                        'name' => $request->name ?? 'unknown',
+                        'email' => $request->email ?? 'unknown'
+                    ]);
+                    
+                    // Return success silently to avoid alerting bots
+                    return response()->json([
+                        'success' => true, 
+                        'message' => 'Your request has been submitted successfully. We will get back to you soon.'
+                    ]);
+                }
+            }
+            
             $check = $this->has_url($request->message);
             if($check == 1){
                 if($request->verify_contact == $request->verify_contact_input){
