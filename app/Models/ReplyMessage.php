@@ -117,13 +117,14 @@ class ReplyMessage extends Model
 
     public static function laptopHire($name, $email, $phone, $pickup_date, $number_of_laptops, $desired_specs, $hireRequest = null){
         // Prepare structured data for email template
-        $data = array(
-            'name' => $name,
-            'phone' => $phone,
-            'pickup_date' => $pickup_date,
-            'number_of_laptops' => $number_of_laptops,
-            'desired_specs' => nl2br(e($desired_specs))
-        );
+        // Ensure all variables are properly set and sanitized
+        $data = [
+            'name' => $name ?? 'Not provided',
+            'phone' => $phone ?? 'Not provided',
+            'pickup_date' => $pickup_date ?? 'Not provided',
+            'number_of_laptops' => $number_of_laptops ?? 0,
+            'desired_specs' => !empty($desired_specs) ? nl2br(e($desired_specs)) : 'Not provided'
+        ];
         
         // Create plain text version for logging (without email address)
         $plainTextContent = "New Equipment Hire Request\n\n";
@@ -154,7 +155,7 @@ class ReplyMessage extends Model
         // Get email from site settings or use fallback
         $toVariable = $SiteSettings->email_one ?? 'info@royaltech.co.ke';
         $toVariableName = "Royaltech Computers Limited";
-        
+
         $errorMessage = null;
         $sentMessage = null;
         
@@ -197,7 +198,15 @@ class ReplyMessage extends Model
                 throw new \Exception("Invalid sender email address: {$FromVariable}");
             }
 
-            Mail::send('mailHireRequest', $data, function($message) use ($subject,$FromVariable,$FromVariableName,$toVariable,$toVariableName,$email,$ccEmails){
+            // Send email with properly structured data
+            // Ensure all variables are available in the view scope
+            Mail::send('mailHireRequest', [
+                'name' => $data['name'],
+                'phone' => $data['phone'],
+                'pickup_date' => $data['pickup_date'],
+                'number_of_laptops' => $data['number_of_laptops'],
+                'desired_specs' => $data['desired_specs']
+            ], function($message) use ($subject,$FromVariable,$FromVariableName,$toVariable,$toVariableName,$email,$name,$ccEmails){
                 $message->from($FromVariable, $FromVariableName);
                 $message->to($toVariable, $toVariableName);
                 
@@ -285,7 +294,13 @@ class ReplyMessage extends Model
                     // Ignore if table doesn't exist
                 }
                 
-                Mail::send('mailHireRequest', $data, function($message) use ($subject,$fallbackFromEmail,$FromVariableName,$fallbackEmail,$email,$name){
+                Mail::send('mailHireRequest', [
+                    'name' => $data['name'],
+                    'phone' => $data['phone'],
+                    'pickup_date' => $data['pickup_date'],
+                    'number_of_laptops' => $data['number_of_laptops'],
+                    'desired_specs' => $data['desired_specs']
+                ], function($message) use ($subject,$fallbackFromEmail,$FromVariableName,$fallbackEmail,$email,$name){
                     $message->from($fallbackFromEmail, $FromVariableName);
                     $message->to($fallbackEmail, 'Royaltech Computers Limited');
                     $message->replyTo($email, $name);
@@ -333,12 +348,12 @@ class ReplyMessage extends Model
         $subject = "New Message";
         $FromVariable = "royaltech2022@gmail.com";
         $FromVariableName = "Royaltech Company Limited";
-        
+
         // Get email from site settings or use fallback
         $SiteSettings = DB::table('_site_settings')->first();
         $toVariable = $SiteSettings->email_one ?? 'info@royaltech.co.ke';
         $toVariableName = "Royaltech Computers Limited";
-        
+
         try {
             // Use site settings email or fallback
             $ccEmails = [];
@@ -381,7 +396,7 @@ class ReplyMessage extends Model
             try {
                 $fallbackEmail = 'albertmuhatia@gmail.com';
                 Mail::send('mailContact', $data, function($message) use ($subject,$FromVariable,$FromVariableName,$fallbackEmail,$email){
-                    $message->from($FromVariable , $FromVariableName);
+            $message->from($FromVariable , $FromVariableName);
                     $message->to($fallbackEmail, 'Royaltech Computers Limited');
                     $message->replyTo($email);
                     $message->subject($subject . ' [FALLBACK]');

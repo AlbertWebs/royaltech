@@ -73,31 +73,31 @@
                           <tr>
                             <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 12px 0; border-bottom: 1px solid #eeeeee;">
                               <strong style="color: #333333; display: inline-block; min-width: 140px;">Customer Name:</strong>
-                              <span style="color: #555555;">{{ $name }}</span>
+                              <span style="color: #555555;">{{ $name ?? 'Not provided' }}</span>
                             </td>
                           </tr>
                           <tr>
                             <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 12px 0; border-bottom: 1px solid #eeeeee;">
                               <strong style="color: #333333; display: inline-block; min-width: 140px;">Contact Phone:</strong>
-                              <span style="color: #555555;">{{ $phone }}</span>
+                              <span style="color: #555555;">{{ $phone ?? 'Not provided' }}</span>
                             </td>
                           </tr>
                           <tr>
                             <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 12px 0; border-bottom: 1px solid #eeeeee;">
                               <strong style="color: #333333; display: inline-block; min-width: 140px;">Requested Date:</strong>
-                              <span style="color: #555555;">{{ $pickup_date }}</span>
+                              <span style="color: #555555;">{{ $pickup_date ?? 'Not provided' }}</span>
                             </td>
                           </tr>
                           <tr>
                             <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 12px 0; border-bottom: 1px solid #eeeeee;">
                               <strong style="color: #333333; display: inline-block; min-width: 140px;">Quantity:</strong>
-                              <span style="color: #555555;">{{ $number_of_laptops }} unit(s)</span>
+                              <span style="color: #555555;">{{ $number_of_laptops ?? 0 }} unit(s)</span>
                             </td>
                           </tr>
                           <tr>
                             <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 12px 0;">
                               <strong style="color: #333333; display: block; margin-bottom: 8px;">Equipment Specifications:</strong>
-                              <div style="background-color: #f8f9fa; padding: 15px; border-radius: 4px; color: #555555; line-height: 1.6;">{{ $desired_specs }}</div>
+                              <div style="background-color: #f8f9fa; padding: 15px; border-radius: 4px; color: #555555; line-height: 1.6;">{!! $desired_specs ?? 'Not provided' !!}</div>
                             </td>
                           </tr>
                         </table>
