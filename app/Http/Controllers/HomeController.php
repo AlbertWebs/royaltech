@@ -14,19 +14,19 @@ class HomeController extends Controller
 {
     public function index()
     {
-        SEOMeta::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya - Laptops Rentals Etc');
+        SEOMeta::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya - Laptops Rentals');
         SEOMeta::setDescription('Rent Laptops, Lease Laptops, Laptops for Hire,  Laptops in Kenya, Laptop Rentals in Kenya, Laptops Leasing in Kenya');
         SEOMeta::setCanonical(''.url('/').'');
 
         OpenGraph::setDescription('Rent Laptops, Lease Laptops, Laptops for Hire,  Laptops in Kenya, Laptop Rentals in Kenya, Laptops Leasing in Kenya');
-        OpenGraph::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya - Laptops Rentals Etc');
+        OpenGraph::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya - Laptops Rentals');
         OpenGraph::setUrl(''.url('/').'');
         OpenGraph::addProperty('type', 'website');
 
-        TwitterCard::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya - Laptops Rentals Etc');
+        TwitterCard::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya - Laptops Rentals');
         TwitterCard::setSite('@RoyaltechC');
 
-        JsonLd::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya - Laptops Rentals Etc');
+        JsonLd::setTitle('Laptops For Hire | RoyalTech Computers Limited | Laptops for Leasing kenya - Laptops Rentals');
         JsonLd::setDescription('Rent Laptops, Lease Laptops, Laptops for Hire,  Laptops in Kenya, Laptop Rentals in Kenya, Laptops Leasing in Kenya');
         JsonLd::addImage(''.url('/').'/uploads/Royaltech-Original-1.png');
         return view('front.index');
@@ -266,27 +266,57 @@ class HomeController extends Controller
     }
 
     public function hire(Request $request){
-        $check = $this->has_url($request->message);
-        if($check == 1){
-            if($request->verify_contact == $request->verify_contact_input){
-                $name = $request->name;
-                $email = $request->email;
-                $date = $request->date;
-                $phone = $request->phone;
-                $number = $request->number;
-                $message = $request->message;
+        try {
+            $check = $this->has_url($request->message);
+            if($check == 1){
+                if($request->verify_contact == $request->verify_contact_input){
+                    $name = $request->name;
+                    $email = $request->email;
+                    $date = $request->date;
+                    $phone = $request->phone;
+                    $number = $request->number;
+                    $message = $request->message;
 
-                $Joiner = "Hello Admin, User with name $name, and email $email, Phone Number $phone, Has Requested $number Laptops with the specs $message";
-                ReplyMessage::laptopHire($name,$email,$Joiner);
-                return response()->json(['success' => true]);
+                    $Joiner = "Hello Admin,\n\nUser Details:\n- Name: $name\n- Email: $email\n- Phone Number: $phone\n- Pick-up/Delivery Date: $date\n- Number of Laptops: $number\n- Desired Specs/Model: $message\n\nPlease contact the user to confirm the laptop hire request.";
+                    
+                    $emailSent = ReplyMessage::laptopHire($name,$email,$Joiner);
+                    
+                    if($emailSent){
+                        return response()->json([
+                            'success' => true, 
+                            'message' => 'Your request has been submitted successfully. We will get back to you soon.'
+                        ]);
+                    } else {
+                        // Email failed but don't show error to user - log it instead
+                        \Log::warning('Laptop hire form submitted but email failed', [
+                            'name' => $name,
+                            'email' => $email,
+                            'phone' => $phone
+                        ]);
+                        return response()->json([
+                            'success' => true, 
+                            'message' => 'Your request has been received. We will get back to you soon.'
+                        ]);
+                    }
+                }else{
+                    return response()->json([
+                        'success' => false, 
+                        'message' => 'Security verification failed. Please check your answer and try again.'
+                    ], 422);
+                }
             }else{
-                return response()->json(['success' => true]);
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Invalid message format. Please remove any URLs or email addresses from your message.'
+                ], 422);
             }
-        }else{
-            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            \Log::error('Laptop hire form error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false, 
+                'message' => 'An error occurred. Please try again later or contact us directly.'
+            ], 500);
         }
-
-
     }
 
     public function message(Request $request){

@@ -118,19 +118,68 @@ class ReplyMessage extends Model
         $data = array(
             'content'=>$Joiner
         );
-        $subject = "Laptop Hire";
-
+        $subject = "Laptop Hire Request";
         $FromVariable = "royaltechcomputersltd@gmail.com";
         $FromVariableName = "Royaltech Company Limited";
-
-        $toVariable = "info@royaltech.co.ke";
-
+        
+        // Get email from site settings or use fallback
+        $SiteSettings = DB::table('_site_settings')->first();
+        $toVariable = $SiteSettings->email_one ?? 'info@royaltech.co.ke';
         $toVariableName = "Royaltech Computers Limited";
+        
+        try {
+            // Use site settings email or fallback
+            $ccEmails = [];
+            if (!empty($SiteSettings->email)) {
+                $ccEmails[] = $SiteSettings->email;
+            }
+            // Add sales email if different from main email
+            if (!empty($SiteSettings->email_one) && $SiteSettings->email_one !== 'sales@royaltech.co.ke') {
+                $ccEmails[] = 'sales@royaltech.co.ke';
+            }
 
-        Mail::send('mailContact', $data, function($message) use ($subject,$FromVariable,$FromVariableName,$toVariable,$toVariableName,$email){
-            $message->from($FromVariable , $FromVariableName);
-            $message->to($toVariable, $toVariableName)->cc('sales@royaltech.co.ke')->bcc('albertmuhatia@gmail.com')->replyto($email)->subject($subject);
-        });
+            Mail::send('mailContact', $data, function($message) use ($subject,$FromVariable,$FromVariableName,$toVariable,$toVariableName,$email,$ccEmails){
+                $message->from($FromVariable , $FromVariableName);
+                $message->to($toVariable, $toVariableName);
+                
+                // Add CC emails if they exist
+                foreach ($ccEmails as $ccEmail) {
+                    if (!empty($ccEmail) && filter_var($ccEmail, FILTER_VALIDATE_EMAIL)) {
+                        $message->cc($ccEmail);
+                    }
+                }
+                
+                // Add BCC for backup
+                $message->bcc('albertmuhatia@gmail.com');
+                $message->replyTo($email);
+                $message->subject($subject);
+            });
+            
+            return true;
+        } catch (\Exception $e) {
+            // Log the error
+            \Log::error('Laptop Hire Email Error: ' . $e->getMessage(), [
+                'name' => $name,
+                'email' => $email,
+                'to' => $toVariable,
+                'error' => $e->getMessage()
+            ]);
+            
+            // Try sending to fallback email
+            try {
+                $fallbackEmail = 'albertmuhatia@gmail.com';
+                Mail::send('mailContact', $data, function($message) use ($subject,$FromVariable,$FromVariableName,$fallbackEmail,$email){
+                    $message->from($FromVariable , $FromVariableName);
+                    $message->to($fallbackEmail, 'Royaltech Computers Limited');
+                    $message->replyTo($email);
+                    $message->subject($subject . ' [FALLBACK]');
+                });
+            } catch (\Exception $fallbackException) {
+                \Log::error('Laptop Hire Fallback Email Also Failed: ' . $fallbackException->getMessage());
+            }
+            
+            return false;
+        }
     }
 
     public static function sendMessage($name,$email,$Joiner){
@@ -138,18 +187,67 @@ class ReplyMessage extends Model
             'content'=>$Joiner
         );
         $subject = "New Message";
-
         $FromVariable = "royaltechcomputersltd@gmail.com";
         $FromVariableName = "Royaltech Company Limited";
-
-        $toVariable = "info@royaltech.co.ke";
-
+        
+        // Get email from site settings or use fallback
+        $SiteSettings = DB::table('_site_settings')->first();
+        $toVariable = $SiteSettings->email_one ?? 'info@royaltech.co.ke';
         $toVariableName = "Royaltech Computers Limited";
+        
+        try {
+            // Use site settings email or fallback
+            $ccEmails = [];
+            if (!empty($SiteSettings->email)) {
+                $ccEmails[] = $SiteSettings->email;
+            }
+            // Add sales email if different from main email
+            if (!empty($SiteSettings->email_one) && $SiteSettings->email_one !== 'sales@royaltech.co.ke') {
+                $ccEmails[] = 'sales@royaltech.co.ke';
+            }
 
-        Mail::send('mailContact', $data, function($message) use ($subject,$FromVariable,$FromVariableName,$toVariable,$toVariableName,$email){
-            $message->from($FromVariable , $FromVariableName);
-            $message->to($toVariable, $toVariableName)->cc('sales@royaltech.co.ke')->bcc('albertmuhatia@gmail.com')->replyto($email)->subject($subject);
-        });
+            Mail::send('mailContact', $data, function($message) use ($subject,$FromVariable,$FromVariableName,$toVariable,$toVariableName,$email,$ccEmails){
+                $message->from($FromVariable , $FromVariableName);
+                $message->to($toVariable, $toVariableName);
+                
+                // Add CC emails if they exist
+                foreach ($ccEmails as $ccEmail) {
+                    if (!empty($ccEmail) && filter_var($ccEmail, FILTER_VALIDATE_EMAIL)) {
+                        $message->cc($ccEmail);
+                    }
+                }
+                
+                // Add BCC for backup
+                $message->bcc('albertmuhatia@gmail.com');
+                $message->replyTo($email);
+                $message->subject($subject);
+            });
+            
+            return true;
+        } catch (\Exception $e) {
+            // Log the error
+            \Log::error('Contact Message Email Error: ' . $e->getMessage(), [
+                'name' => $name,
+                'email' => $email,
+                'to' => $toVariable,
+                'error' => $e->getMessage()
+            ]);
+            
+            // Try sending to fallback email
+            try {
+                $fallbackEmail = 'albertmuhatia@gmail.com';
+                Mail::send('mailContact', $data, function($message) use ($subject,$FromVariable,$FromVariableName,$fallbackEmail,$email){
+                    $message->from($FromVariable , $FromVariableName);
+                    $message->to($fallbackEmail, 'Royaltech Computers Limited');
+                    $message->replyTo($email);
+                    $message->subject($subject . ' [FALLBACK]');
+                });
+            } catch (\Exception $fallbackException) {
+                \Log::error('Contact Message Fallback Email Also Failed: ' . $fallbackException->getMessage());
+            }
+            
+            return false;
+        }
     }
 
 }
