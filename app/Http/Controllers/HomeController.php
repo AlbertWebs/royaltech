@@ -9,6 +9,7 @@ use Artesaos\SEOTools\Facades\OpenGraph;
 use Artesaos\SEOTools\Facades\TwitterCard;
 use Artesaos\SEOTools\Facades\JsonLd;
 use App\Models\ReplyMessage;
+use App\Models\LaptopHireRequest;
 
 class HomeController extends Controller
 {
@@ -277,27 +278,36 @@ class HomeController extends Controller
                     $number = $request->number;
                     $message = $request->message;
 
-                    $Joiner = "Hello Admin,\n\nUser Details:\n- Name: $name\n- Email: $email\n- Phone Number: $phone\n- Pick-up/Delivery Date: $date\n- Number of Laptops: $number\n- Desired Specs/Model: $message\n\nPlease contact the user to confirm the laptop hire request.";
-                    
-                    $emailSent = ReplyMessage::laptopHire($name,$email,$Joiner);
-                    
-                    if($emailSent){
-                        return response()->json([
-                            'success' => true, 
-                            'message' => 'Your request has been submitted successfully. We will get back to you soon.'
+                    // Save to database first
+                    try {
+                        $hireRequest = LaptopHireRequest::create([
+                            'name' => $name,
+                            'email' => $email,
+                            'phone' => $phone,
+                            'pickup_date' => $date,
+                            'number_of_laptops' => $number,
+                            'desired_specs' => $message,
+                            'status' => 'pending'
                         ]);
-                    } else {
-                        // Email failed but don't show error to user - log it instead
-                        \Log::warning('Laptop hire form submitted but email failed', [
+                    } catch (\Exception $dbException) {
+                        \Log::error('Failed to save laptop hire request to database: ' . $dbException->getMessage(), [
                             'name' => $name,
                             'email' => $email,
                             'phone' => $phone
                         ]);
-                        return response()->json([
-                            'success' => true, 
-                            'message' => 'Your request has been received. We will get back to you soon.'
-                        ]);
+                        // Continue with email even if DB save fails
                     }
+
+                    // Send email notification
+                    $Joiner = "Hello Admin,\n\nUser Details:\n- Name: $name\n- Email: $email\n- Phone Number: $phone\n- Pick-up/Delivery Date: $date\n- Number of Laptops: $number\n- Desired Specs/Model: $message\n\nPlease contact the user to confirm the laptop hire request.";
+                    
+                    $emailSent = ReplyMessage::laptopHire($name,$email,$Joiner);
+                    
+                    // Always return success if database save worked, even if email fails
+                    return response()->json([
+                        'success' => true, 
+                        'message' => 'Your request has been submitted successfully. We will get back to you soon.'
+                    ]);
                 }else{
                     return response()->json([
                         'success' => false, 
@@ -311,7 +321,9 @@ class HomeController extends Controller
                 ], 422);
             }
         } catch (\Exception $e) {
-            \Log::error('Laptop hire form error: ' . $e->getMessage());
+            \Log::error('Laptop hire form error: ' . $e->getMessage(), [
+                'request_data' => $request->except(['_token', 'verify_contact', 'verify_contact_input'])
+            ]);
             return response()->json([
                 'success' => false, 
                 'message' => 'An error occurred. Please try again later or contact us directly.'
