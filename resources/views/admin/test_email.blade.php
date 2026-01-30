@@ -160,11 +160,24 @@
                         </div>
                         <div>
                             <dt class="text-xs font-medium text-gray-500 uppercase">From Address</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ config('mail.from.address', 'Not configured') }}</dd>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                @php
+                                    $fromEmail = config('mail.from.address') ?: env('MAIL_FROM_ADDRESS') ?: ($SiteSettings->email_one ?? 'royaltechcomputersltd@gmail.com');
+                                @endphp
+                                {{ $fromEmail ?: 'Not configured' }}
+                                @if(empty(config('mail.from.address')) && empty(env('MAIL_FROM_ADDRESS')))
+                                    <span class="text-yellow-600 text-xs ml-1">(using fallback)</span>
+                                @endif
+                            </dd>
                         </div>
                         <div>
                             <dt class="text-xs font-medium text-gray-500 uppercase">From Name</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ config('mail.from.name', 'Not configured') }}</dd>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                @php
+                                    $fromName = config('mail.from.name') ?: env('MAIL_FROM_NAME') ?: 'Royaltech Company Limited';
+                                @endphp
+                                {{ $fromName ?: 'Not configured' }}
+                            </dd>
                         </div>
                         @if(config('mail.default') === 'smtp')
                         <div>

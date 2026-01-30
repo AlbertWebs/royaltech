@@ -154,8 +154,35 @@ class AdminsController extends Controller
         
         // Get site settings for from email
         $SiteSettings = DB::table('_site_settings')->first();
-        $fromEmail = config('mail.from.address', 'royaltechcomputersltd@gmail.com');
-        $fromName = config('mail.from.name', 'Royaltech Company Limited');
+        
+        // Get from email with multiple fallbacks
+        $fromEmail = config('mail.from.address');
+        if (empty($fromEmail)) {
+            $fromEmail = env('MAIL_FROM_ADDRESS');
+        }
+        if (empty($fromEmail) && $SiteSettings && !empty($SiteSettings->email_one)) {
+            $fromEmail = $SiteSettings->email_one;
+        }
+        if (empty($fromEmail)) {
+            $fromEmail = 'royaltechcomputersltd@gmail.com'; // Final fallback
+        }
+        
+        // Get from name with fallbacks
+        $fromName = config('mail.from.name');
+        if (empty($fromName)) {
+            $fromName = env('MAIL_FROM_NAME');
+        }
+        if (empty($fromName)) {
+            $fromName = 'Royaltech Company Limited'; // Final fallback
+        }
+
+        // Validate email address
+        if (!filter_var($fromEmail, FILTER_VALIDATE_EMAIL)) {
+            Session::flash('email_test_success', false);
+            Session::flash('email_test_message', 'Invalid from email address configured');
+            Session::flash('email_test_error', "The configured 'from' email address '{$fromEmail}' is not valid. Please check your mail configuration.");
+            return redirect()->back();
+        }
 
         $result = [
             'success' => false,
