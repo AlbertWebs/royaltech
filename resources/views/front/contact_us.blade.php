@@ -57,7 +57,7 @@
 							<div class="icon-box"><span class="flaticon-email-1"></span></div>
 							<ul>
 								<li><strong>E-Mail</strong></li>
-								<li>info@royaltech.co.ke<br>support@royaltech.co.ke</li>
+								<li>info@royaltech.co.ke<br>sales@royaltech.co.ke</li>
 							</ul>
 						</div>
 					</div>
